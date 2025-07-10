@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackea tu Mente - Unidad 2: Sesgos Cognitivos</title>
+    <style>
+        /* ----- Estilos Generales y Fondo ----- */
+        :root {
+            --color-primary: #4CAF50; /* Verde */
+            --color-secondary: #FFC107; /* Amarillo */
+            --color-accent: #2196F3; /* Azul */
+            --color-background-start: #4facfe; /* Azul claro */
+            --color-background-end: #00f2fe; /* Cian */
+            --color-dragged: rgba(255, 255, 255, 0.8);
+            --color-correct: #4CAF50; /* Verde */
+            --color-incorrect: #F44336; /* Rojo */
+            --color-text: #333;
+            --color-border: #ccc;
+            --color-dropzone-hover: rgba(76, 175, 80, 0.2); /* Verde translúcido */
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, var(--color-background-start), var(--color-background-end));
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden; /* Evita scroll horizontal */
+            flex-direction: column; /* Para centrar el contenido verticalmente */
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 800px;
+            box-sizing: border-box;
+            text-align: center;
+            margin-top: 20px; /* Espacio para el logo */
+            margin-bottom: 20px;
+        }
+
+        /* ----- Logo del Curso (Imagen) con efecto pulsante ----- */
+        .course-logo {
+            width: 300px; /* Tamaño considerable */
+            height: 300px; /* Tamaño considerable */
+            object-fit: contain; /* Asegura que la imagen no se distorsione */
+            display: block; /* Para que ocupe su propio espacio */
+            margin: 20px auto; /* Centra el logo */
+            animation: pulse 2s infinite; /* Aplica la animación */
+        }
+
+        /* ----- Animación Pulsante ----- */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* ----- Sección Inicial ----- */
+        #intro-section {
+            margin-bottom: 30px;
+            margin-top: 15px; /* <<<--- Reducido para juntar el texto con el logo */
+        }
+
+        /* H1 del título del curso ha sido eliminado */
+        /*
+        #intro-section h1 {
+            color: var(--color-accent);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        */
+
+        #intro-section h2 {
+            color: var(--color-text);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        #intro-section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .start-button {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .start-button:hover {
+            background-color: #e0a800;
+            transform: translateY(-3px);
+        }
+
+        /* ----- Modo de Juego: Tarjetas ----- */
+        #game-section {
+            display: none; /* Oculto inicialmente */
+            width: 100%;
+        }
+
+        .game-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap; /* Para que se adapte a pantallas pequeñas */
+        }
+
+        .column {
+            flex: 1;
+            min-width: 250px; /* Ancho mínimo para las columnas */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .column h3 {
+            color: var(--color-accent);
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: 5px;
+        }
+
+        /* Estilos para las "drop zones" (Sesgos Cognitivos) */
+        .drop-zone {
+            background-color: #f0f0f0;
+            border: 2px dashed var(--color-border);
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 100px;
+            width: 90%;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Alinea los elementos al inicio */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            position: relative; /* Para el mensaje de respuesta */
+        }
+
+        .drop-zone.correct {
+            background-color: rgba(76, 175, 80, 0.3); /* Verde translúcido */
+            border-color: var(--color-correct);
+        }
+
+        .drop-zone.incorrect {
+            background-color: rgba(244, 67, 54, 0.3); /* Rojo translúcido */
+            border-color: var(--color-incorrect);
+        }
+
+        .drop-zone span.correct-text {
+            color: var(--color-correct);
+            font-weight: bold;
+            margin-top: 10px;
+            display: none; /* Oculto hasta verificar */
+        }
+
+        .drop-zone span.incorrect-text {
+            color: var(--color-incorrect);
+            font-weight: bold;
+            margin-top: 10px;
+            display: none; /* Oculto hasta verificar */
+        }
+
+        /* Estilos para las "tarjetas arrastrables" (Escenarios) */
+        .draggable-card {
+            background-color: white;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+            cursor: grab;
+            transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            width: 85%;
+            box-sizing: border-box;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .draggable-card.dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: grabbing;
+        }
+
+        .draggable-card.matched {
+            cursor: default;
+            opacity: 0.7; /* Ligeramente atenuado después de ser asignado */
+        }
+
+        /* ----- Botón de Verificación y Resumen ----- */
+        .verification-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .verify-button {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .verify-button:hover {
+            background-color: #388e3c;
+            transform: translateY(-2px);
+        }
+
+        .verify-button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #results-summary {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--color-text);
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--color-border);
+            display: none; /* Oculto inicialmente */
+            margin-top: 20px;
+        }
+
+        #results-summary.correct {
+            color: var(--color-correct);
+            border-color: var(--color-correct);
+        }
+
+        #results-summary.encouragement {
+            color: var(--color-accent);
+            border-color: var(--color-accent);
+        }
+
+        /* ----- Cita de Cierre ----- */
+        .closing-quote {
+            margin-top: 40px;
+            font-style: italic;
+            color: #555;
+            font-size: 0.95em;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ----- Responsive Design ----- */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .course-logo {
+                width: 150px; /* Ajustado para móviles */
+                height: 150px; /* Ajustado para móviles */
+            }
+
+            #intro-section h1 {
+                font-size: 2em; /* Si estuviera presente, este sería su tamaño */
+            }
+
+            #intro-section h2 {
+                font-size: 1.5em;
+            }
+
+            .start-button {
+                font-size: 1.1em;
+                padding: 12px 25px;
+            }
+
+            .game-wrapper {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .column {
+                width: 100%;
+            }
+
+            .drop-zone, .draggable-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Logo del Curso (Imagen) -->
+        <!-- Asegúrate de que 'LOGO OFICIAL.png' esté en la misma carpeta o actualiza la ruta -->
+        <img src="LOGO OFICIAL.png" alt="Logo Hackea tu Mente" class="course-logo">
+
+        <!-- Sección de Presentación Inicial -->
+        <section id="intro-section">
+            <!-- Título "Hackea tu Mente" eliminado -->
+            <h2>Unidad 2: Cómo afectan nuestras decisiones diarias</h2>
+            <p>Pon a prueba tus conocimientos sobre los sesgos cognitivos y aprende a identificarlos en tu vida cotidiana. ¡Arrastra y suelta para conectar los escenarios con los sesgos correctos!</p>
+            <button class="start-button" id="startButton">¡Iniciar ahora!</button>
+        </section>
+
+        <!-- Sección del Juego -->
+        <section id="game-section">
+            <div class="game-wrapper">
+                <!-- Columna Izquierda: Zonas de Soltar (Sesgos) -->
+                <div class="column left-column">
+                    <h3>Sesgos Cognitivos</h3>
+                    <div class="drop-zone" data-bias-id="effect-senuelo">
+                        <span class="bias-name">Efecto Señuelo</span>
+                        <span class="correct-text">Opción menos atractiva para influir en la elección del consumidor.</span>
+                        <span class="incorrect-text">Prioriza evitar una pérdida.</span>
+                    </div>
+                    <div class="drop-zone" data-bias-id="sesgo-escasez">
+                        <span class="bias-name">Sesgo de Escasez</span>
+                        <span class="correct-text">La disponibilidad limitada aumenta el valor percibido.</span>
+                        <span class="incorrect-text">Creer que los eventos negativos son menos probables para uno mismo.</span>
+                    </div>
+                    <div class="drop-zone" data-bias-id="aversión-perdida">
+                        <span class="bias-name">Aversión a la Pérdida</span>
+                        <span class="correct-text">Preferir evitar pérdidas incluso si significa sacrificar ganancias potenciales.</span>
+                        <span class="incorrect-text">Preferencia por recompensas inmediatas sobre futuras.</span>
+                    </div>
+                    <div class="drop-zone" data-bias-id="sesgo-optimismo">
+                        <span class="bias-name">Sesgo de Optimismo</span>
+                        <span class="correct-text">Subestimar la probabilidad de que ocurran eventos negativos personales.</span>
+                        <span class="incorrect-text">Atención desproporcionada a la información negativa.</span>
+                    </div>
+                    <div class="drop-zone" data-bias-id="sesgo-presente">
+                        <span class="bias-name">Sesgo del Presente</span>
+                        <span class="correct-text">Valorar más las recompensas obtenidas ahora que las futuras.</span>
+                        <span class="incorrect-text">La disponibilidad limitada aumenta el valor percibido.</span>
+                    </div>
+                    <div class="drop-zone" data-bias-id="sesgo-negatividad">
+                        <span class="bias-name">Sesgo de Negatividad</span>
+                        <span class="correct-text">Prestar más atención y dar más peso a la información negativa.</span>
+                        <span class="incorrect-text">Opción menos atractiva para influir en la elección del consumidor.</span>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Tarjetas Arrastrables (Escenarios) -->
+                <div class="column right-column">
+                    <h3>Escenarios Cotidianos</h3>
+                    <!-- Las tarjetas serán generadas y ordenadas por JavaScript -->
+                </div>
+            </div>
+
+            <div class="verification-area">
+                <button class="verify-button" id="verifyButton">Verificar Respuestas</button>
+                <div id="results-summary"></div>
+            </div>
+        </section>
+    </div>
+
+    <div class="closing-quote">
+        "Somos peones en un juego cuyas fuerzas no comprendemos en gran medida". - Dan Ariely
+    </div>
+
+    <script>
+        // ----- Datos de los Sesgos y Escenarios -----
+        const biasesData = [
+            { id: 'effect-senuelo', name: 'Efecto Señuelo', description: 'Una opción de menor valor se introduce para hacer que una opción de mayor valor parezca más atractiva (ej: palomitas medianas a $4, grandes a $7, mientras que las pequeñas a $3.50, haciendo que las medianas parezcan una mejor oferta).' },
+            { id: 'sesgo-escasez', name: 'Sesgo de Escasez', description: 'Un producto se anuncia con "últimas unidades disponibles" o una oferta que termina pronto para incentivar la compra inmediata.' },
+            { id: 'aversión-perdida', name: 'Aversión a la Pérdida', description: 'Un médico le dice a un paciente que, si no cambia su dieta, tiene un 30% de posibilidades de sufrir un infarto, pero si la cambia, reduce ese riesgo en un 10% (el paciente se enfoca más en evitar el infarto que en la mejora).' },
+            { id: 'sesgo-optimismo', name: 'Sesgo de Optimismo', description: 'Una persona cree que es menos probable que contraiga una enfermedad o tenga un accidente en comparación con otras personas.' },
+            { id: 'sesgo-presente', name: 'Sesgo del Presente', description: 'Elegir recibir $50 hoy en lugar de $60 la próxima semana.' },
+            { id: 'sesgo-negatividad', name: 'Sesgo de Negatividad', description: ' Pasar más tiempo leyendo o viendo noticias sobre crímenes y desastres que sobre noticias positivas o avances.' }
+        ];
+
+        // Mapeo para obtener el ID del sesgo desde el nombre del sesgo
+        const biasNameToId = {};
+        biasesData.forEach(bias => {
+            biasNameToId[bias.name] = bias.id;
+        });
+
+        // ----- Elementos del DOM -----
+        const startButton = document.getElementById('startButton');
+        const introSection = document.getElementById('intro-section');
+        const gameSection = document.getElementById('game-section');
+        const leftColumn = document.querySelector('.left-column');
+        const rightColumn = document.querySelector('.right-column');
+        const verifyButton = document.getElementById('verifyButton');
+        const resultsSummary = document.getElementById('results-summary');
+
+        let draggedElement = null;
+        let correctMatches = 0;
+        let totalQuestions = 0;
+        let gameActive = true;
+
+        // ----- Funciones de Inicialización y Manejo de Eventos -----
+
+        // Función para barajar un array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Inicializar el juego: barajar y mostrar tarjetas
+        function initializeGame() {
+            // Limpiar contenido previo si lo hubiera
+            rightColumn.innerHTML = '';
+            // Limpiar estilos de feedback de respuestas previas
+            document.querySelectorAll('.drop-zone').forEach(dz => {
+                dz.classList.remove('correct', 'incorrect');
+                dz.querySelector('.correct-text').style.display = 'none';
+                dz.querySelector('.incorrect-text').style.display = 'none';
+            });
+            document.querySelectorAll('.draggable-card').forEach(card => {
+                card.classList.remove('matched', 'dragging');
+                card.style.cursor = 'grab';
+                card.draggable = true; // Asegurar que sean arrastrables
+            });
+
+            correctMatches = 0;
+            totalQuestions = biasesData.length;
+            gameActive = true;
+            verifyButton.disabled = false;
+            resultsSummary.style.display = 'none';
+
+            // Barajar los escenarios y crear las tarjetas
+            const shuffledBiases = shuffleArray([...biasesData]);
+            shuffledBiases.forEach(bias => {
+                const card = document.createElement('div');
+                card.classList.add('draggable-card');
+                card.textContent = bias.description;
+                card.setAttribute('draggable', true);
+                card.dataset.originalBiasId = bias.id; // Guardar el ID del sesgo original para verificar
+
+                // Eventos para arrastrar y soltar
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+
+                rightColumn.appendChild(card);
+            });
+
+            // Configurar las zonas de soltar con sus nombres y IDs
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        // Manejar el inicio del arrastre
+        function handleDragStart(e) {
+            if (!gameActive) return;
+            draggedElement = e.target;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', e.target.dataset.originalBiasId); // Pasar el ID del sesgo original
+            e.target.classList.add('dragging');
+        }
+
+        // Manejar el fin del arrastre
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        // Manejar cuando un elemento arrastrable está sobre una zona de soltar
+        function handleDragOver(e) {
+            e.preventDefault(); // Necesario para permitir el drop
+            e.dataTransfer.dropEffect = 'move';
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.style.backgroundColor = 'var(--color-dropzone-hover)';
+            }
+        }
+
+        // Manejar cuando un elemento arrastrable sale de una zona de soltar
+        function handleDragLeave(e) {
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.style.backgroundColor = ''; // Volver al color por defecto
+                // Si es incorrecto/correcto, que no pierda ese feedback visual
+                if (!e.target.classList.contains('correct') && !e.target.classList.contains('incorrect')) {
+                    e.target.style.backgroundColor = '#f0f0f0'; // Color por defecto de la drop-zone
+                }
+            }
+        }
+
+        // Manejar el soltar de una tarjeta en una zona
+        function handleDrop(e) {
+            e.preventDefault();
+            if (!gameActive || !draggedElement) return;
+
+            const targetDropZone = e.target.closest('.drop-zone'); // Asegura que sea la drop-zone
+            if (!targetDropZone) return;
+
+            const droppedBiasId = draggedElement.dataset.originalBiasId;
+            const targetBiasId = targetDropZone.dataset.biasId;
+
+            // Eliminar feedback de hover
+            targetDropZone.style.backgroundColor = '';
+
+            // Verificar si la tarjeta ya fue asignada (para evitar duplicados)
+            if (draggedElement.classList.contains('matched')) {
+                return;
+            }
+
+            // Comprobar si la respuesta es correcta
+            const isCorrect = (droppedBiasId === targetBiasId);
+
+            if (isCorrect) {
+                targetDropZone.classList.add('correct');
+                targetDropZone.querySelector('.correct-text').style.display = 'block';
+                targetDropZone.querySelector('.incorrect-text').style.display = 'none';
+                correctMatches++;
+                draggedElement.classList.add('matched'); // Marcar como asignada
+                draggedElement.draggable = false; // Desactivar arrastre para esta tarjeta
+                draggedElement.style.cursor = 'default';
+                // Mover la tarjeta a la zona de soltar visualmente (opcional, si se quiere)
+                // targetDropZone.appendChild(draggedElement);
+            } else {
+                targetDropZone.classList.add('incorrect');
+                targetDropZone.querySelector('.correct-text').style.display = 'none';
+                targetDropZone.querySelector('.incorrect-text').style.display = 'block';
+                // Devolver la tarjeta a su columna original o a un "pool" de no asignados
+                draggedElement.draggable = true; // Re-habilitar arrastre
+                draggedElement.style.cursor = 'grab';
+                rightColumn.appendChild(draggedElement); // Devolverla a la columna derecha
+            }
+        }
+
+        // Verificar respuestas y mostrar resultados
+        function verifyAnswers() {
+            if (!gameActive) return;
+
+            let incorrectCount = 0;
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dropZones.forEach(zone => {
+                const droppedElement = Array.from(zone.children).find(child => child.classList.contains('draggable-card') && !child.classList.contains('matched'));
+
+                // Si la zona no tiene una tarjeta asignada (debería ocurrir si las respuestas no fueron correctas y se devolvieron)
+                // O si la tarjeta asignada no es la correcta
+                const correctBiasId = zone.dataset.biasId;
+                const droppedBiasId = droppedElement ? droppedElement.dataset.originalBiasId : null;
+
+                const isCorrect = (droppedBiasId === correctBiasId);
+
+                if (!isCorrect) {
+                    zone.classList.add('incorrect');
+                    zone.querySelector('.correct-text').style.display = 'none'; // Ocultar texto de correcto si existe
+                    zone.querySelector('.incorrect-text').style.display = 'block'; // Mostrar texto de incorrecto
+                    incorrectCount++;
+                } else {
+                    zone.classList.add('correct');
+                    zone.querySelector('.correct-text').style.display = 'block'; // Mostrar texto de correcto
+                    zone.querySelector('.incorrect-text').style.display = 'none'; // Ocultar texto de incorrecto
+                }
+            });
+
+            // Actualizar el resumen de resultados
+            const numCorrect = document.querySelectorAll('.drop-zone.correct').length;
+            const total = biasesData.length;
+            let message = '';
+
+            if (numCorrect === total) {
+                message = `¡Felicidades! Has completado la unidad con ${numCorrect} de ${total} respuestas correctas. ¡Excelente trabajo!`;
+                resultsSummary.classList.add('correct');
+            } else {
+                message = `Tienes ${numCorrect} de ${total} respuestas correctas. ¡No te desanimes! Revisa tus respuestas y sigue aprendiendo.`;
+                resultsSummary.classList.add('encouragement');
+            }
+
+            resultsSummary.textContent = message;
+            resultsSummary.style.display = 'block';
+
+            // Desactivar interactividad
+            gameActive = false;
+            verifyButton.disabled = true;
+            document.querySelectorAll('.draggable-card').forEach(card => {
+                card.draggable = false;
+                card.style.cursor = 'default';
+            });
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.style.cursor = 'default';
+            });
+        }
+
+        // ----- Event Listeners -----
+        startButton.addEventListener('click', () => {
+            introSection.style.display = 'none';
+            gameSection.style.display = 'block';
+            initializeGame();
+        });
+
+        verifyButton.addEventListener('click', verifyAnswers);
+
+    </script>
+</body>
+</html>

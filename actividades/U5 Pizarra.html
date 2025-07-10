@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizarra Interactiva: Anatomía de una Decisión Crítica</title>
+    <style>
+        /* Estilos generales y de la aplicación */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        /* Estilos para el logo */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px; /* Espacio debajo del logo */
+            padding-bottom: 20px; /* Pequeño padding para separarlo del título principal */
+            border-bottom: 1px solid #eee; /* Una línea sutil para separar */
+        }
+
+        .logo-container img {
+            max-width: 260px; /* AUMENTADO EN UN 30% (200px * 1.30) */
+            height: auto; /* Mantiene la proporción */
+            opacity: 0.9; /* Ligeramente atenuado para ser elegante */
+            transition: opacity 0.3s ease; /* Suavidad al pasar el ratón */
+        }
+
+        .logo-container img:hover {
+            opacity: 1; /* Opacidad completa al pasar el ratón */
+        }
+
+        /* Estilos del título principal y subtítulo */
+        .main-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .sub-title {
+            font-size: 1.2em;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .decision-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.3em;
+            color: #555;
+            font-style: italic;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+
+        /* Selector de casos */
+        .decision-selector {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #ecf0f1;
+        }
+
+        .decision-selector label {
+            margin-right: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .decision-selector select,
+        .decision-selector input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            margin-left: 5px;
+            font-size: 1em;
+        }
+
+        .decision-selector input[type="text"] {
+            width: 250px;
+        }
+
+        .decision-selector button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .decision-selector button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Estructura de la pizarra */
+        .pizarra {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .section {
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .section.logical { background-color: #d4e6f1; border: 1px solid #aed6f1; }
+        .section.emotional { background-color: #fef9e7; border: 1px solid #fdebd0; }
+        .section.cognitive { background-color: #f5cba7; border: 1px solid #f0b27a; }
+        .section.ethics { background-color: #d5f5e3; border: 1px solid #a9dfbf; }
+
+        .section h2 {
+            color: #1a5276;
+            margin-top: 0;
+            font-size: 1.5em;
+            border-bottom: 2px solid #85c1e9;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Estilos para el prefijo '■' en los títulos de sección */
+        .section h2::before {
+            content: '■ '; /* Simula el cuadrado negro */
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-right: 5px;
+        }
+        .section.cognitive h2::before { color: #c0392b; } /* Color específico para sesgos */
+        .section.ethics h2::before { color: #1e8449; } /* Color específico para ética */
+
+        .section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .section li {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        /* Estilos para los puntos de las listas */
+        .section li::before {
+            content: '•';
+            color: #2980b9; /* Color por defecto para puntos */
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            position: absolute;
+            left: 0;
+        }
+        /* Colores específicos para puntos según categoría */
+        .section li.cognitive::before { color: #c0392b; }
+        .section li.ethics::before { color: #1e8449; }
+        .section li.note::before { color: #7f8c8d; } /* Color sutil para notas añadidas */
+
+        /* Área de entrada de notas */
+        .note-input-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            background-color: #e8f6f3;
+            text-align: center;
+        }
+
+        .note-input-area textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            font-size: 1em;
+            min-height: 80px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .note-input-area button {
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .note-input-area button:hover {
+            background-color: #229954;
+        }
+
+        /* Notas añadidas por el usuario */
+        .added-notes {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .added-notes .note {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            border: 1px solid #f9e79f;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            font-size: 0.95em;
+            word-wrap: break-word;
+        }
+
+        .added-notes .note.cognitive { border-color: #f5b7b1; }
+        .added-notes .note.ethics { border-color: #a3e4d7; }
+
+        /* Área de reflexión */
+        .reflection-area {
+            margin-top: 40px;
+            padding: 20px;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            background-color: #eaf2f8;
+            text-align: center;
+        }
+
+        .reflection-area h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+
+        .reflection-area p {
+            font-size: 1.1em;
+            font-style: italic;
+            color: #555;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo de la Marca -->
+        <div class="logo-container">
+            <img src="LOGO PRINCIPAL.png" alt="Logo de la Marca Hackea tu mente">
+        </div>
+
+        <!-- Título Principal -->
+        <div class="main-title">La Anatomía de una Decisión Crítica</div>
+        <div class="sub-title">"Decidir si hacer un máster el próximo año”</div>
+
+        <!-- Selector de Casos -->
+        <div class="decision-selector">
+            <label for="case-select">Selecciona un Caso:</label>
+            <select id="case-select">
+                <option value="master">Máster (Ejemplo)</option>
+                <option value="car">Comprar un Coche Nuevo</option>
+                <option value="career">Cambiar de Carrera Profesional</option>
+                <option value="move">Mudarse a Otra Ciudad/País</option>
+                <option value="invest">Invertir Dinero Significativo</option>
+                <option value="event">Aceptar/Rechazar Invitación Importante</option>
+            </select>
+            <button onclick="loadCase()">Cargar Caso</button>
+        </div>
+
+        <!-- Estructura de la Pizarra -->
+        <div class="pizarra">
+            <div class="section logical" id="logical-section">
+                <h2>Factores Lógicos / Analíticos</h2>
+                <ul id="logical-list">
+                    <!-- Contenido se cargará aquí -->
+                </ul>
+            </div>
+            <div class="section emotional" id="emotional-section">
+                <h2>Aspectos Emocionales</h2>
+                <ul id="emotional-list">
+                    <!-- Contenido se cargará aquí -->
+                </ul>
+            </div>
+            <div class="section cognitive" id="cognitive-section">
+                <h2>Posibles Sesgos Cognitivos</h2>
+                <ul id="cognitive-list">
+                    <!-- Contenido se cargará aquí -->
+                </ul>
+            </div>
+            <div class="section ethics" id="ethics-section">
+                <h2>Cuestiones Éticas / De Valores</h2>
+                <ul id="ethics-list">
+                    <!-- Contenido se cargará aquí -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Área de Entrada de Notas -->
+        <div class="note-input-area">
+            <h3>Escribe tu idea:</h3>
+            <textarea id="user-note" placeholder="Escribe tu idea aquí..."></textarea>
+            <br>
+            <label for="category-select">Categoría:</label>
+            <select id="category-select">
+                <option value="logical">Lógicos/Analíticos</option>
+                <option value="emotional">Emocionales</option>
+                <option value="cognitive">Sesgos Cognitivos</option>
+                <option value="ethics">Éticas/De Valores</option>
+            </select>
+            <button onclick="addNote()">Agregar Nota</button>
+        </div>
+
+        <!-- Área de Reflexión -->
+        <div class="reflection-area">
+            <h3>Reflexiona:</h3>
+            <p>¿Qué predominó en tu decisión? ¿Qué valor es más importante para ti en este caso?</p>
+            <div id="user-reflection">
+                <!-- Aquí se mostrará la reflexión del usuario -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data que contiene la información de cada caso
+        const caseData = {
+            master: {
+                title: "Decidir si hacer un máster el próximo año",
+                sections: {
+                    logical: [
+                        "Costo del máster y posibilidad de financiamiento",
+                        "Duración total y horarios",
+                        "Modalidad (presencial/online)",
+                        "Prestigio de la institución",
+                        "Retorno esperado de la inversión"
+                    ],
+                    emotional: [
+                        "Miedo al cambio o al fracaso",
+                        "Entusiasmo por nuevos aprendizajes",
+                        "Presión familiar o social",
+                        "Inseguridad sobre capacidades",
+                        "Ansiedad ante lo desconocido"
+                    ],
+                    cognitive: [
+                        "Sesgo de confirmación",
+                        "Efecto de arrastre (otros lo hacen)",
+                        "Anclaje en precio de referencia",
+                        "Aversión a la pérdida",
+                        "Exceso de confianza"
+                    ],
+                    ethics: [
+                        "¿Cómo impacta a mi familia?",
+                        "¿Se alinea con mi propósito?",
+                        "¿Responde a un deseo profundo?",
+                        "¿Favorece el crecimiento personal?",
+                        "¿Contribuye a mi comunidad?"
+                    ]
+                }
+            },
+            car: {
+                title: "Comprar un Coche Nuevo",
+                sections: {
+                    logical: [
+                        "Presupuesto y opciones de financiamiento",
+                        "Consumo de combustible y costos de mantenimiento",
+                        "Características de seguridad y fiabilidad del modelo",
+                        "Valor de reventa futuro",
+                        "Necesidades de espacio y tipo de uso"
+                    ],
+                    emotional: [
+                        "Sentimiento de seguridad y tranquilidad",
+                        "Deseo de impresionar o tener el último modelo",
+                        "Estrés por la avería del coche anterior",
+                        "Emoción de estrenar",
+                        "Preocupación por arrepentirse de la compra"
+                    ],
+                    cognitive: [
+                        "Sesgo de confirmación (buscar datos que validen un modelo)",
+                        "Efecto anclaje (fijarse en el precio inicial)",
+                        "Aversión a la pérdida (dejar de tener coche vs. mala compra)",
+                        "Sesgo de disponibilidad (basarse en experiencias recientes)",
+                        "Exceso de confianza en la negociación"
+                    ],
+                    ethics: [
+                        "Impacto ambiental",
+                        "Alineación con valor de frugalidad vs. comodidad",
+                        "Prioridad en presupuesto familiar",
+                        "Valores de la marca (sostenibilidad, origen)",
+                        "Contribución a la economía local"
+                    ]
+                }
+            },
+            career: {
+                title: "Cambiar de Carrera Profesional",
+                sections: {
+                    logical: [
+                        "Análisis del mercado y potencial de éxito del negocio",
+                        "Proyecciones financieras y flujo de caja",
+                        "Habilidades requeridas vs. existentes",
+                        "Costo de oportunidad (lo que se deja de ganar)",
+                        "Análisis de la competencia y diferenciación"
+                    ],
+                    emotional: [
+                        "Pasión y entusiasmo por el nuevo proyecto",
+                        "Miedo al fracaso e inestabilidad",
+                        "Sensación de propósito y autorrealización",
+                        "Estrés por la incertidumbre",
+                        "Ilusión por la autonomía"
+                    ],
+                    cognitive: [
+                        "Sesgo de optimismo (subestimar riesgos)",
+                        "Efecto dotación (apego a lo que se tiene)",
+                        "Efecto de halo (cualidades positivas que se extienden)",
+                        "Sesgo de confirmación (buscar historias de éxito)",
+                        "Exceso de confianza en habilidades de gestión"
+                    ],
+                    ethics: [
+                        "Propósito mayor del negocio",
+                        "Impacto en la estabilidad familiar",
+                        "Fidelidad a valores personales",
+                        "Ética y sostenibilidad del negocio",
+                        "Legado que se quiere construir"
+                    ]
+                }
+            },
+            move: {
+                title: "Mudarse a Otra Ciudad o País",
+                sections: {
+                    logical: [
+                        "Costo de vida en la nueva ubicación",
+                        "Oportunidades laborales y de desarrollo",
+                        "Calidad de vida (educación, salud, seguridad)",
+                        "Logística de la mudanza",
+                        "Impacto en ingresos y gastos"
+                    ],
+                    emotional: [
+                        "Nostalgia y apego al lugar actual",
+                        "Emoción por la aventura",
+                        "Miedo a la soledad y a no adaptarse",
+                        "Estrés por dejar amigos y familia",
+                        "Expectativa de mejor calidad de vida"
+                    ],
+                    cognitive: [
+                        "Sesgo de anclaje (comparar todo con la ciudad actual)",
+                        "Efecto de arrastre (influencia de otros)",
+                        "Sesgo de disponibilidad (información superficial)",
+                        "Aversión a la pérdida (dejar el hogar)",
+                        "Efecto de confirmación (buscar que la mudanza sea buena)"
+                    ],
+                    ethics: [
+                        "Impacto en la familia",
+                        "Alineación con valor de aventura vs. estabilidad",
+                        "¿Se huye de problemas o se busca algo mejor?",
+                        "Contribución a la comunidad receptora",
+                        "Responsabilidades antes de irse"
+                    ]
+                }
+            },
+            invest: {
+                title: "Invertir una Suma de Dinero Significativa",
+                sections: {
+                    logical: [
+                        "Riesgo y retorno potencial de inversiones",
+                        "Horizonte temporal de la inversión",
+                        "Diversificación del portafolio",
+                        "Implicaciones fiscales",
+                        "Impacto de la inflación"
+                    ],
+                    emotional: [
+                        "Miedo a perder el dinero",
+                        "Ansiedad por la complejidad",
+                        "Excitación por grandes retornos",
+                        "Sentimiento de seguridad financiera",
+                        "Presión por la 'mejor' elección"
+                    ],
+                    cognitive: [
+                        "Sesgo de confirmación (buscar analistas que apoyen la inversión)",
+                        "Efecto de rebaño (invertir en lo popular)",
+                        "Aversión a la pérdida (no vender una inversión perdedora)",
+                        "Sesgo de anclaje (precio histórico, rendimiento de otra inversión)",
+                        "Exceso de confianza en predecir el mercado"
+                    ],
+                    ethics: [
+                        "Apoyo a empresas o sectores alineados con valores",
+                        "Impacto en el futuro familiar y responsabilidad",
+                        "¿La forma de invertir es 'correcta'?",
+                        "Contribución a la economía",
+                        "Conflicto entre acumulación y generosidad"
+                    ]
+                }
+            },
+            event: {
+                title: "Aceptar o Rechazar una Invitación a un Evento Importante",
+                sections: {
+                    logical: [
+                        "Costos asociados (viaje, alojamiento, regalos)",
+                        "Tiempo dedicado vs. otras responsabilidades",
+                        "Oportunidades de networking/aprendizaje",
+                        "Beneficios de asistir (relaciones, expectativas)",
+                        "Posibilidad de alternativas al evento"
+                    ],
+                    emotional: [
+                        "Deseo de estar con seres queridos",
+                        "Miedo a perderse algo (FOMO)",
+                        "Estrés por la logística o interacción social",
+                        "Sentimiento de obligación/compromiso",
+                        "Ansiedad por interacción específica"
+                    ],
+                    cognitive: [
+                        "Sesgo de confirmación (buscar razones para ir/no ir)",
+                        "Efecto de arrastre (si todos van, yo también)",
+                        "Aversión a la pérdida (perder la experiencia)",
+                        "Efecto de anclaje (recordar eventos pasados)",
+                        "Sesgo de disponibilidad (basado en el último evento)"
+                    ],
+                    ethics: [
+                        "Impacto de la asistencia/ausencia en relaciones",
+                        "Alineación con valor de comunidad/familia/crecimiento",
+                        "¿Asistencia por obligación o deseo?",
+                        "Contribución a un ambiente positivo en el evento",
+                        "Honestidad sobre las razones de la decisión"
+                    ]
+                }
+            }
+        };
+
+        let currentCase = 'master'; // Caso inicial por defecto
+
+        // Función para cargar el contenido de un caso específico
+        function loadCase() {
+            currentCase = document.getElementById('case-select').value;
+            const caseInfo = caseData[currentCase];
+
+            document.querySelector('.sub-title').textContent = `"${caseInfo.title}"`;
+
+            // Limpiar secciones anteriores
+            document.getElementById('logical-list').innerHTML = '';
+            document.getElementById('emotional-list').innerHTML = '';
+            document.getElementById('cognitive-list').innerHTML = '';
+            document.getElementById('ethics-list').innerHTML = '';
+            document.getElementById('user-note').value = ''; // Limpiar el área de notas
+            document.getElementById('user-reflection').innerHTML = ''; // Limpiar reflexión
+
+            // Llenar las secciones con el contenido del caso seleccionado
+            const sections = {
+                logical: document.getElementById('logical-list'),
+                emotional: document.getElementById('emotional-list'),
+                cognitive: document.getElementById('cognitive-list'),
+                ethics: document.getElementById('ethics-list')
+            };
+
+            for (const sectionType in caseInfo.sections) {
+                caseInfo.sections[sectionType].forEach(itemText => {
+                    const li = document.createElement('li');
+                    li.textContent = itemText;
+                    li.classList.add('note'); // Añade clase general para notas
+                    // Añade clases específicas para estilos condicionales de puntos
+                    if (sectionType === 'cognitive') li.classList.add('cognitive');
+                    if (sectionType === 'ethics') li.classList.add('ethics');
+                    sections[sectionType].appendChild(li);
+                });
+            }
+        }
+
+        // Función para agregar notas del usuario
+        function addNote() {
+            const userNoteInput = document.getElementById('user-note');
+            const categorySelect = document.getElementById('category-select');
+            const noteText = userNoteInput.value.trim();
+            const category = categorySelect.value; // 'logical', 'emotional', 'cognitive', 'ethics'
+
+            if (!noteText) {
+                alert("Por favor, escribe una nota.");
+                return;
+            }
+
+            const sectionElementId = `${category}-list`;
+            const sectionList = document.getElementById(sectionElementId);
+
+            const newNote = document.createElement('li');
+            newNote.textContent = noteText;
+            newNote.classList.add('note'); // Añade una clase general para las notas
+            // Añade una clase específica para estilizar según la categoría si es necesario
+            if (category === 'cognitive') newNote.classList.add('cognitive');
+            if (category === 'ethics') newNote.classList.add('ethics');
+
+            sectionList.appendChild(newNote);
+            userNoteInput.value = ''; // Limpiar el textarea
+            // Opcional: resetear la selección de categoría para la siguiente nota
+            // categorySelect.value = 'logical';
+        }
+
+        // Cargar el caso por defecto al inicio
+        document.addEventListener('DOMContentLoaded', loadCase);
+
+    </script>
+</body>
+</html>

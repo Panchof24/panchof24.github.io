@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Análisis Crítico Interactivo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px; /* Espacio debajo del logo */
+        }
+        .logo-container img {
+            max-width: 280px; /* Aumentado en un 40% */
+            height: auto;
+            display: block; /* Asegura que el logo sea un bloque para centrarlo */
+            margin: 0 auto; /* Centra el logo */
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .objective, .instructions {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: #e9ecef;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+        }
+        .lens-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        .lens-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .lens-title::before {
+            content: '▼'; /* Down arrow by default */
+            margin-right: 10px;
+            font-size: 0.8em;
+            transition: transform 0.2s ease-in-out;
+        }
+        .lens-title.collapsed::before {
+            content: '►'; /* Right arrow when collapsed */
+        }
+        .lens-content {
+            padding-left: 20px;
+            border-left: 2px dashed #ced4da;
+            display: block; /* Default to block */
+        }
+        .lens-content.hidden {
+            display: none;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            min-height: 80px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .case-selector {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+        }
+        .case-selector select, .case-selector button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .case-selector select {
+            background-color: white;
+            color: #007bff;
+        }
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        .hidden-input {
+            display: none;
+        }
+        .additional-info {
+            font-style: italic;
+            color: #555;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sección del Logo -->
+        <div class="logo-container">
+            <img src="LOGO PRINCIPAL.png" alt="Logo de la Marca Hackea tu Mente">
+        </div>
+
+        <h1>Mapa de Análisis Crítico</h1>
+
+        <div class="objective">
+            <h2>Objetivo:</h2>
+            <p>Organizar visualmente el análisis crítico de un caso real o personal aplicando las 'lentes' del curso (neurociencia, sesgos, narrativa, emociones, decisiones éticas), como paso previo a la producción audiovisual final.</p>
+        </div>
+
+        <div class="case-selector">
+            <h2>Selecciona un Caso:</h2>
+            <select id="case-select">
+                <option value="default">-- Elije un caso --</option>
+                <option value="case1">Caso 1: El Experimento del Pequeño Albert</option>
+                <option value="case2">Caso 2: La Crisis de los Misiles de Cuba</option>
+                <option value="case3">Caso 3: El Dilema del Tranvía</option>
+                <option value="case4">Caso 4: El Caso Kitty Genovese</option>
+                <option value="case5">Caso 5: La Desaparición de Amelia Earhart</option>
+            </select>
+            <button onclick="loadCase()">Cargar Caso</button>
+            <button onclick="resetForm()">Reiniciar Todo</button>
+        </div>
+
+        <div id="analysis-map">
+            <!-- Nodo Central -->
+            <div class="lens-section" id="central-node">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[■]</span> Nodo central (caso de estudio):
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <div>
+                        <label for="case-title">Título del caso:</label><br>
+                        <textarea id="case-title" data-case-id="central-node"></textarea>
+                    </div>
+                    <div>
+                        <label for="central-question">Pregunta central:</label><br>
+                        <textarea id="central-question" data-case-id="central-node"></textarea>
+                    </div>
+                    <div>
+                        <label for="central-description">Breve descripción (1-2 líneas):</label><br>
+                        <textarea id="central-description" data-case-id="central-node"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lente Neurocientífica -->
+            <div class="lens-section" id="neuroscience-lens">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[■]</span> Lente Neurocientífica
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <ul>
+                        <li>
+                            Sistema 1 vs. Sistema 2 en los actores del caso:<br>
+                            <textarea class="sub-input" data-case-id="neuroscience-lens" data-id="s1-s2"></textarea>
+                        </li>
+                        <li>
+                            Reacciones automáticas vs. pensamiento deliberado:<br>
+                            <textarea class="sub-input" data-case-id="neuroscience-lens" data-id="auto-delib"></textarea>
+                        </li>
+                        <li>
+                            Evidencias: frases, decisiones, reacciones observables:<br>
+                            <textarea class="sub-input" data-case-id="neuroscience-lens" data-id="evidence"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lente de los Sesgos Cognitivos -->
+            <div class="lens-section" id="cognitive-biases-lens">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[■]</span> Lente de los Sesgos Cognitivos
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <ul>
+                        <li>
+                            Sesgos identificados (mínimo 3): ej. sesgo de confirmación, de anclaje, de grupo:<br>
+                            <textarea class="sub-input" data-case-id="cognitive-biases-lens" data-id="identified-biases"></textarea>
+                        </li>
+                        <li>
+                            Impacto del sesgo en la narrativa o decisiones:<br>
+                            <textarea class="sub-input" data-case-id="cognitive-biases-lens" data-id="impact"></textarea>
+                        </li>
+                        <li>
+                            Evidencias: citas, comportamientos, decisiones:<br>
+                            <textarea class="sub-input" data-case-id="cognitive-biases-lens" data-id="evidence"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lente Narrativa -->
+            <div class="lens-section" id="narrative-lens">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[■]</span> Lente Narrativa
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <ul>
+                        <li>
+                            ¿Qué historia se cuenta?:<br>
+                            <textarea class="sub-input" data-case-id="narrative-lens" data-id="story-told"></textarea>
+                        </li>
+                        <li>
+                            ¿Quién la cuenta y con qué propósito?:<br>
+                            <textarea class="sub-input" data-case-id="narrative-lens" data-id="who-tells"></textarea>
+                        </li>
+                        <li>
+                            Narrativa de manipulación/liberación:<br>
+                            <textarea class="sub-input" data-case-id="narrative-lens" data-id="manip-liberation"></textarea>
+                        </li>
+                        <li>
+                            Uso de imágenes o metáforas:<br>
+                            <textarea class="sub-input" data-case-id="narrative-lens" data-id="images-metaphors"></textarea>
+                        </li>
+                        <li>
+                            Evidencias textuales o visuales:<br>
+                            <textarea class="sub-input" data-case-id="narrative-lens" data-id="text-visual-evidence"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lente Emocional -->
+            <div class="lens-section" id="emotional-lens">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[■]</span> Lente Emocional
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <ul>
+                        <li>
+                            Emociones visibles en los protagonistas:<br>
+                            <textarea class="sub-input" data-case-id="emotional-lens" data-id="visible-emotions"></textarea>
+                        </li>
+                        <li>
+                            Señales de secuestro amigdalino:<br>
+                            <textarea class="sub-input" data-case-id="emotional-lens" data-id="amygdala-hijack"></textarea>
+                        </li>
+                        <li>
+                            Inteligencia emocional presente o ausente:<br>
+                            <textarea class="sub-input" data-case-id="emotional-lens" data-id="emotional-intelligence"></textarea>
+                        </li>
+                        <li>
+                            Impacto emocional en decisiones o relaciones:<br>
+                            <textarea class="sub-input" data-case-id="emotional-lens" data-id="emotional-impact"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Lente Decisional y Ética -->
+            <div class="lens-section" id="decisional-ethical-lens">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[■]</span> Lente Decisional y Ética
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <ul>
+                        <li>
+                            Decisión clave analizada:<br>
+                            <textarea class="sub-input" data-case-id="decisional-ethical-lens" data-id="key-decision"></textarea>
+                        </li>
+                        <li>
+                            Valores en juego:<br>
+                            <textarea class="sub-input" data-case-id="decisional-ethical-lens" data-id="values-at-play"></textarea>
+                        </li>
+                        <li>
+                            ¿Hubo un proceso de decisión ético y sólido?:<br>
+                            <textarea class="sub-input" data-case-id="decisional-ethical-lens" data-id="ethical-process"></textarea>
+                        </li>
+                        <li>
+                            Aplicación del modelo D.E.C.I.D.E. o matriz de decisión:<br>
+                            <textarea class="sub-input" data-case-id="decisional-ethical-lens" data-id="model-application"></textarea>
+                        </li>
+                        <li>
+                            Conclusión: ¿se podría haber decidido mejor?:<br>
+                            <textarea class="sub-input" data-case-id="decisional-ethical-lens" data-id="conclusion"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Espacio Adicional -->
+            <div class="lens-section" id="additional-space">
+                <h3>
+                    <span class="lens-title">
+                        <span class="node-icon">[⇒■]</span> Espacio adicional en cada rama:
+                    </span>
+                </h3>
+                <div class="lens-content">
+                    <ul>
+                        <li>
+                            'Ideas clave para incluir en el guion final':<br>
+                            <textarea class="sub-input" data-case-id="additional-space" data-id="key-ideas"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>Instrucciones para el uso en clase:</h2>
+            <ul>
+                <li>Elige un caso significativo, relevante y abordable.</li>
+                <li>Completa la Propuesta de Proyecto (título, descripción, pregunta central).</li>
+                <li>Usa esta estructura para crear tu mapa interactivo.</li>
+                <li>Coloca en cada lente los conceptos aprendidos y vincúlalos con ejemplos concretos del caso.</li>
+                <li>Destaca en color distinto (ej. amarillo) las partes que quieres usar en tu guion audiovisual. (Puedes hacer clic en el texto de las áreas de texto para resaltarlo).</li>
+                <li>Comparte tu mapa con un compañero para recibir feedback antes de grabar tu producción.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Función para alternar la visibilidad de las secciones de las lentes
+        document.querySelectorAll('.lens-title').forEach(item => {
+            item.addEventListener('click', event => {
+                const lensContent = event.currentTarget.parentElement.nextElementSibling;
+                lensContent.classList.toggle('hidden');
+                event.currentTarget.classList.toggle('collapsed');
+            });
+        });
+
+        // Función para resaltar texto en textareas
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('click', function(e) {
+                // Simula la selección del texto actual del textarea
+                this.select();
+                // Añade la clase de resaltado
+                // Nota: execCommand está obsoleto, pero para simulación en este contexto puede funcionar.
+                // Una alternativa más moderna sería usar estilos CSS directamente o una librería.
+                try {
+                    document.execCommand('HiliteColor', false, 'yellow');
+                } catch(e) {
+                    // Si execCommand falla (navegadores modernos), aplica estilo directamente
+                    this.style.backgroundColor = 'yellow';
+                }
+            });
+            // Al salir del foco, quita el resaltado (o puedes mantenerlo si prefieres)
+            textarea.addEventListener('blur', function() {
+                // Opcional: Remover el resaltado al perder el foco
+                // this.style.backgroundColor = '';
+                // Si quieres que el resaltado sea persistente hasta el siguiente click, déjalo comentado.
+            });
+        });
+
+        // Objeto para almacenar los datos de los casos
+        const casesData = {
+            case1: {
+                title: "El Experimento del Pequeño Albert",
+                centralQuestion: "¿Cómo las asociaciones condicionadas influyeron en el comportamiento de un niño?",
+                centralDescription: "Un experimento clásico en psicología que demostró el condicionamiento clásico en humanos, generando debates éticos.",
+                neuroscience: {
+                    s1_s2: "Sistema 1 (respuesta emocional inmediata al ruido blanco) vs. Sistema 2 (análisis posterior del miedo).",
+                    auto_delib: "La respuesta de miedo de Albert es automática (Sistema 1) ante el estímulo asociado.",
+                    evidence: "Llanto de Albert ante el ratón blanco, asociando el ruido fuerte con la presencia del ratón."
+                },
+                cognitiveBiases: {
+                    identifiedBiases: "Sesgo de confirmación (Watson buscando confirmar su teoría), Sesgo de representatividad (generalizar el miedo a otros objetos blancos).",
+                    impact: "El sesgo de confirmación pudo haber llevado a Watson a interpretar las reacciones de Albert de forma favorable a su hipótesis.",
+                    evidence: "El énfasis en la generalización del miedo a otros objetos similares."
+                },
+                narrative: {
+                    storyTold: "La historia de un experimento científico que demuestra el poder del condicionamiento.",
+                    whoTells: "Principalmente el registro del propio Watson y análisis posteriores.",
+                    manipLiberation: "Potencialmente manipuladora al no considerar plenamente el bienestar del niño.",
+                    imagesMetaphors: "El ratón blanco como símbolo de inocencia corrompida por el miedo.",
+                    textVisualEvidence: "Fotos de Albert con el ratón, descripciones del llanto y la reacción."
+                },
+                emotional: {
+                    visibleEmotions: "Miedo, angustia, sorpresa en Albert.",
+                    amygdalaHijack: "El experimento provoca un secuestro amigdalino al asociar un estímulo neutro con uno aversivo.",
+                    emotionalIntelligence: "Ausente en el experimentador respecto al sujeto.",
+                    emotionalImpact: "El miedo aprendido afectó negativamente la experiencia del niño."
+                },
+                decisionalEthical: {
+                    keyDecision: "Proceder con el experimento a pesar de los riesgos para el niño.",
+                    valuesAtPlay: "Avance científico vs. protección del sujeto.",
+                    ethicalProcess: "Proceso ético muy deficiente según estándares modernos.",
+                    modelApplication: "El modelo DECIDE no se aplicó éticamente; la decisión fue unilateral.",
+                    conclusion: "Sí, la decisión de exponer a un niño a un trauma sin consentimiento ni medidas de descondicionamiento fue inaceptable."
+                },
+                additionalSpace: {
+                    keyIdeas: "Énfasis en la ética en la investigación, el impacto a largo plazo del trauma infantil, la replicabilidad y validez del experimento."
+                }
+            },
+            case2: {
+                title: "La Crisis de los Misiles de Cuba",
+                centralQuestion: "¿Cómo la toma de decisiones bajo presión extrema afectó el curso de la Guerra Fría?",
+                centralDescription: "Un enfrentamiento de 13 días entre EE.UU. y la URSS que casi desencadena una guerra nuclear.",
+                neuroscience: {
+                    s1_s2: "Sistema 1 (reacciones impulsivas y miedo) vs. Sistema 2 (análisis estratégico y diplomacia).",
+                    auto_delib: "La presión generó momentos de posible reacción automática, pero prevaleció el análisis deliberado.",
+                    evidence: "Las largas discusiones y deliberaciones dentro del comité ejecutivo (ExComm)."
+                },
+                cognitiveBiases: {
+                    identifiedBiases: "Sesgo de anclaje (en las demandas iniciales), Sesgo de confirmación (buscando información que apoye las acciones planeadas), Pensamiento de grupo (cohesión del grupo de asesores).",
+                    impact: "Podría haber limitado la consideración de alternativas menos agresivas inicialmente.",
+                    evidence: "La resistencia inicial a considerar la opción diplomática sin demostrar fuerza."
+                },
+                narrative: {
+                    storyTold: "La historia de una tensa negociación y cómo se evitó una catástrofe.",
+                    whoTells: "Gobiernos, historiadores, analistas de relaciones internacionales.",
+                    manipLiberation: "La narrativa oficial buscó proyectar liderazgo y control.",
+                    imagesMetaphors: "La 'cortina de hierro', la 'carrera armamentista'.",
+                    textVisualEvidence: "Documentos desclasificados, transmisiones de radio, fotografías de barcos soviéticos."
+                },
+                emotional: {
+                    visibleEmotions: "Miedo, tensión, ansiedad, determinación.",
+                    amygdalaHijack: "El riesgo de guerra nuclear activó respuestas de miedo colectivo e individual.",
+                    emotionalIntelligence: "Crucial para que los líderes mantuvieran la calma y buscaran soluciones.",
+                    emotionalImpact: "El miedo influyó en la urgencia de resolver la crisis."
+                },
+                decisionalEthical: {
+                    keyDecision: "La decisión de Kennedy de imponer un bloqueo naval en lugar de un ataque inmediato.",
+                    valuesAtPlay: "Seguridad nacional, paz mundial, soberanía, no proliferación nuclear.",
+                    ethicalProcess: "Proceso de toma de decisiones complejo, con debate y consulta.",
+                    modelApplication: "Se aplicaron elementos de análisis de riesgos y opciones, buscando la menos perjudicial.",
+                    conclusion: "Sí, la decisión de negociar y buscar una solución pacífica, aunque arriesgada, fue la correcta para evitar la guerra."
+                },
+                additionalSpace: {
+                    keyIdeas: "Importancia de la comunicación clara, el papel de la diplomacia, las consecuencias de la escalada militar, el concepto de 'destrucción mutua asegurada' (MAD)."
+                }
+            },
+            case3: {
+                title: "El Dilema del Tranvía",
+                centralQuestion: "¿Cuándo es éticamente aceptable sacrificar una vida para salvar a muchas?",
+                centralDescription: "Un experimento mental sobre ética y moralidad que explora los principios detrás de la toma de decisiones.",
+                neuroscience: {
+                    s1_s2: "Sistema 1 (repulsión visceral ante el acto de empujar) vs. Sistema 2 (cálculo utilitarista de salvar más vidas).",
+                    auto_delib: "La diferencia entre accionar una palanca (menos emocional) y empujar a alguien (más directo y emocional).",
+                    evidence: "Las respuestas cerebrales varían según la versión del dilema; las áreas de emoción se activan más al empujar."
+                },
+                cognitiveBiases: {
+                    identifiedBiases: "Sesgo de confirmación (buscar justificaciones para la acción preferida), Sesgo de atribución (atribuir intenciones a las víctimas).",
+                    impact: "Influye en la facilidad con la que justificamos una acción sobre otra.",
+                    evidence: "Las variaciones en la elección dependiendo de si se actúa directamente o indirectamente."
+                },
+                narrative: {
+                    storyTold: "Una historia hipotética para explorar principios morales.",
+                    whoTells: "Filósofos, psicólogos, y cualquiera que reflexione sobre ética.",
+                    manipLiberation: "Diseñado para generar un debate, no manipula directamente un evento real.",
+                    imagesMetaphors: "El tranvía como una fuerza imparable del destino o de la consecuencia.",
+                    textVisualEvidence: "Las descripciones detalladas de las dos versiones del dilema."
+                },
+                emotional: {
+                    visibleEmotions: "Generalmente no se aplican a un experimento mental, pero el debate evoca reflexión, dilema.",
+                    amygdalaHijack: "Menos aplicable ya que no hay una amenaza real inmediata.",
+                    emotionalIntelligence: "Evalúa la capacidad de entender y procesar situaciones morales complejas.",
+                    emotionalImpact: "El dilema emocional surge de la culpa potencial, la responsabilidad."
+                },
+                decisionalEthical: {
+                    keyDecision: "Si accionar la palanca para desviar el tranvía (y matar a uno) o no hacer nada (y matar a cinco).",
+                    valuesAtPlay: "Vida humana, utilitarismo, deontología, agencia moral.",
+                    ethicalProcess: "Explora la diferencia entre hacer el mal y permitir que suceda.",
+                    modelApplication: "Los modelos éticos (utilitarismo vs. deontología) ofrecen marcos para la decisión.",
+                    conclusion: "No hay una única respuesta 'correcta'; depende del marco ético que se adopte. Ambos escenarios implican dilemas morales."
+                },
+                additionalSpace: {
+                    keyIdeas: "La importancia de los principios éticos, la diferencia entre acción y omisión, la ética de la situación, la aplicabilidad de la filosofía en la vida real."
+                }
+            },
+            case4: {
+                title: "El Caso Kitty Genovese",
+                centralQuestion: "¿Por qué tantos testigos presenciales no intervinieron para ayudar a una víctima en peligro?",
+                centralDescription: "El brutal asesinato de Kitty Genovese en 1964, donde se informó que docenas de vecinos escucharon o vieron el ataque pero no actuaron.",
+                neuroscience: {
+                    s1_s2: "Sistema 1 (ignorar la situación como 'no mi problema') vs. Sistema 2 (evaluar el riesgo personal de intervenir).",
+                    auto_delib: "La inhibición de la acción puede ser una respuesta automática basada en la evaluación del riesgo.",
+                    evidence: "El silencio general de los testigos, su posterior justificación para no intervenir."
+                },
+                cognitiveBiases: {
+                    identifiedBiases: "Efecto del espectador (Bystander Effect), Difusión de la responsabilidad (cada uno piensa que otro llamará o intervendrá), Sesgo de confirmación (interpretar el silencio de otros como señal de que no es necesario actuar).",
+                    impact: "La presencia de múltiples testigos disminuyó la responsabilidad individual percibida.",
+                    evidence: "La falta de llamadas a la policía, la tardanza de la intervención a pesar de la duración del ataque."
+                },
+                narrative: {
+                    storyTold: "La historia de un fracaso social masivo y la apatía ciudadana.",
+                    whoTells: "Medios de comunicación, psicólogos sociales, académicos.",
+                    manipLiberation: "La narrativa inicial en los medios fue exagerada, creando una versión simplificada y sensacionalista.",
+                    imagesMetaphors: "La 'indiferencia' como un muro, la víctima como solitaria en la multitud.",
+                    textVisualEvidence: "Reportajes periodísticos de la época, análisis sociológicos posteriores."
+                },
+                emotional: {
+                    visibleEmotions: "Miedo, indiferencia, posible culpa o vergüenza en los testigos después.",
+                    amygdalaHijack: "Menos directo en los testigos, pero el miedo a la violencia pudo haber inhibido la acción.",
+                    emotionalIntelligence: "La falta de empatía activa o la supresión de la preocupación de los testigos.",
+                    emotionalImpact: "El impacto en la percepción pública sobre la seguridad y la moralidad de la sociedad."
+                },
+                decisionalEthical: {
+                    keyDecision: "La decisión de cada testigo de no intervenir o llamar a la policía.",
+                    valuesAtPlay: "Seguridad personal vs. deber cívico, responsabilidad moral.",
+                    ethicalProcess: "La ausencia de un proceso de decisión activo de ayuda.",
+                    modelApplication: "Los modelos de decisión en emergencias fallaron ante la multiplicidad de factores inhibidores.",
+                    conclusion: "Sí, era éticamente imperativo intervenir. La falta de acción colectiva fue un fallo moral y social."
+                },
+                additionalSpace: {
+                    keyIdeas: "La psicología social de la intervención, la influencia de los medios, la responsabilidad individual en grupos, la importancia de la acción proactiva en emergencias."
+                }
+            },
+            case5: {
+                title: "La Desaparición de Amelia Earhart",
+                centralQuestion: "¿Qué factores influyeron en la misteriosa desaparición de Amelia Earhart y Fred Noonan?",
+                centralDescription: "La icónica aviadora Amelia Earhart y su copiloto Fred Noonan desaparecieron mientras intentaban dar la vuelta al mundo en avión en 1937.",
+                neuroscience: {
+                    s1_s2: "Sistema 1 (errores de navegación instintivos o fatiga) vs. Sistema 2 (planificación y ejecución de una ruta compleja).",
+                    auto_delib: "Posible falla en la interpretación de datos o toma de decisiones bajo estrés y fatiga.",
+                    evidence: "La última comunicación de radio de Earhart indica dificultades de navegación y visibilidad."
+                },
+                cognitiveBiases: {
+                    identifiedBiases: "Sesgo de confirmación (creer en la teoría favorita de la desaparición), Sesgo de anclaje (a teorías populares como la isla Nikumaroro).",
+                    impact: "Ha llevado a enfocarse en ciertas explicaciones desestimando otras posibles.",
+                    evidence: "La persistencia de teorías populares a pesar de la falta de evidencia concluyente."
+                },
+                narrative: {
+                    storyTold: "La historia de una aventura audaz interrumpida por el misterio.",
+                    whoTells: "Historiadores, entusiastas de la aviación, investigadores, teóricos de la conspiración.",
+                    manipLiberation: "La falta de resolución alimenta diversas narrativas, algunas más especulativas que otras.",
+                    imagesMetaphors: "El cielo como un vasto y peligroso misterio, Earhart como un símbolo de exploración y valentía.",
+                    textVisualEvidence: "Fotografías de Earhart, su avión, mapas de su ruta, transcripciones de comunicaciones por radio."
+                },
+                emotional: {
+                    visibleEmotions: "Determinación, valentía, posible frustración o pánico en las últimas comunicaciones.",
+                    amygdalaHijack: "Menos aplicable a la desaparición en sí, pero el misterio genera ansiedad en quienes lo investigan.",
+                    emotionalIntelligence: "La habilidad de Earhart para manejar los desafíos de la aviación de larga distancia.",
+                    emotionalImpact: "El impacto del misterio en la cultura popular y el legado de Earhart."
+                },
+                decisionalEthical: {
+                    keyDecision: "La decisión de volar la ruta, la navegación en condiciones adversas.",
+                    valuesAtPlay: "Aventura, exploración, superación de límites, riesgo.",
+                    ethicalProcess: "El proceso de planificación y ejecución de una misión de alto riesgo.",
+                    modelApplication: "Se aplicaron cálculos de combustible, rutas, condiciones meteorológicas.",
+                    conclusion: "Las decisiones tomadas en un contexto de alto riesgo y condiciones inciertas llevaron a la tragedia, independientemente de la causa exacta."
+                },
+                additionalSpace: {
+                    keyIdeas: "Importancia de la planificación detallada, la gestión de riesgos, la navegación en condiciones adversas, el poder del misterio y la especulación."
+                }
+            }
+        };
+
+        // Función para cargar los datos de un caso seleccionado
+        function loadCase() {
+            const selectElement = document.getElementById('case-select');
+            const selectedCaseId = selectElement.value;
+
+            if (selectedCaseId === 'default') {
+                alert("Por favor, selecciona un caso primero.");
+                return;
+            }
+
+            const caseData = casesData[selectedCaseId];
+
+            // Limpiar campos antes de cargar nuevos datos
+            resetForm(false); // No alert en reset intermedio
+
+            document.getElementById('case-title').value = caseData.title || "";
+            document.getElementById('central-question').value = caseData.centralQuestion || "";
+            document.getElementById('central-description').value = caseData.centralDescription || "";
+
+            // Lente Neurocientífica
+            document.querySelector('[data-case-id="neuroscience-lens"][data-id="s1-s2"]').value = caseData.neuroscience?.s1_s2 || "";
+            document.querySelector('[data-case-id="neuroscience-lens"][data-id="auto-delib"]').value = caseData.neuroscience?.auto_delib || "";
+            document.querySelector('[data-case-id="neuroscience-lens"][data-id="evidence"]').value = caseData.neuroscience?.evidence || "";
+
+            // Lente de los Sesgos Cognitivos
+            document.querySelector('[data-case-id="cognitive-biases-lens"][data-id="identified-biases"]').value = caseData.cognitiveBiases?.identifiedBiases || "";
+            document.querySelector('[data-case-id="cognitive-biases-lens"][data-id="impact"]').value = caseData.cognitiveBiases?.impact || "";
+            document.querySelector('[data-case-id="cognitive-biases-lens"][data-id="evidence"]').value = caseData.cognitiveBiases?.evidence || "";
+
+            // Lente Narrativa
+            document.querySelector('[data-case-id="narrative-lens"][data-id="story-told"]').value = caseData.narrative?.storyTold || "";
+            document.querySelector('[data-case-id="narrative-lens"][data-id="who-tells"]').value = caseData.narrative?.whoTells || "";
+            document.querySelector('[data-case-id="narrative-lens"][data-id="manip-liberation"]').value = caseData.narrative?.manipLiberation || "";
+            document.querySelector('[data-case-id="narrative-lens"][data-id="images-metaphors"]').value = caseData.narrative?.imagesMetaphors || "";
+            document.querySelector('[data-case-id="narrative-lens"][data-id="text-visual-evidence"]').value = caseData.narrative?.textVisualEvidence || "";
+
+            // Lente Emocional
+            document.querySelector('[data-case-id="emotional-lens"][data-id="visible-emotions"]').value = caseData.emotional?.visibleEmotions || "";
+            document.querySelector('[data-case-id="emotional-lens"][data-id="amygdala-hijack"]').value = caseData.emotional?.amygdalaHijack || "";
+            document.querySelector('[data-case-id="emotional-lens"][data-id="emotional-intelligence"]').value = caseData.emotional?.emotionalIntelligence || "";
+            document.querySelector('[data-case-id="emotional-lens"][data-id="emotional-impact"]').value = caseData.emotional?.emotionalImpact || "";
+
+            // Lente Decisional y Ética
+            document.querySelector('[data-case-id="decisional-ethical-lens"][data-id="key-decision"]').value = caseData.decisionalEthical?.keyDecision || "";
+            document.querySelector('[data-case-id="decisional-ethical-lens"][data-id="values-at-play"]').value = caseData.decisionalEthical?.valuesAtPlay || "";
+            document.querySelector('[data-case-id="decisional-ethical-lens"][data-id="ethical-process"]').value = caseData.decisionalEthical?.ethicalProcess || "";
+            document.querySelector('[data-case-id="decisional-ethical-lens"][data-id="model-application"]').value = caseData.decisionalEthical?.modelApplication || "";
+            document.querySelector('[data-case-id="decisional-ethical-lens"][data-id="conclusion"]').value = caseData.decisionalEthical?.conclusion || "";
+
+            // Espacio Adicional
+            document.querySelector('[data-case-id="additional-space"][data-id="key-ideas"]').value = caseData.additionalSpace?.keyIdeas || "";
+
+            // Opcional: Abrir todas las secciones al cargar un caso
+            document.querySelectorAll('.lens-content').forEach(content => {
+                content.classList.remove('hidden');
+            });
+            document.querySelectorAll('.lens-title').forEach(title => {
+                title.classList.remove('collapsed');
+            });
+        }
+
+        // Función para reiniciar todos los campos y el selector
+        function resetForm(showConfirm = true) {
+            if (showConfirm && !confirm("¿Estás seguro de que deseas reiniciar todos los campos? Se perderá el progreso no guardado.")) {
+                return;
+            }
+            document.getElementById('case-select').value = 'default';
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.value = '';
+                // Remover cualquier resaltado aplicado por error
+                textarea.style.backgroundColor = '';
+            });
+            // Asegurarse de que todas las lentes estén visibles al reiniciar
+            document.querySelectorAll('.lens-content').forEach(content => {
+                content.classList.remove('hidden');
+            });
+            document.querySelectorAll('.lens-title').forEach(title => {
+                title.classList.remove('collapsed');
+            });
+        }
+    </script>
+</body>
+</html>

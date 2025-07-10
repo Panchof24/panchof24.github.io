@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackea Tu Mente - Encuesta Interactiva</title>
+    <style>
+        /* --- Estilos Generales --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- Contenedor Principal --- */
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px 40px;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Estructura de Página --- */
+        .page {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        /* --- NUEVO: Estilo del Logo SVG y su contenedor --- */
+        .logo-container {
+            margin-bottom: 25px;
+        }
+        .logo-svg {
+            width: 150px;
+            height: auto;
+        }
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0 5px 0;
+        }
+        .logo-tagline {
+            font-size: 1rem;
+            color: #555;
+            margin: 0;
+        }
+
+        /* --- Títulos y Párrafos --- */
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #4a4a4a;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        /* --- Entradas de texto y botones --- */
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            font-size: 1.2rem;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-image: linear-gradient(to right, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+        }
+        
+        .emotion-buttons button {
+            margin: 5px;
+            background-image: linear-gradient(to right, #6c757d, #5a6268);
+        }
+        
+        .emotion-buttons button:hover {
+             box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .nav-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn-back {
+            background-image: none;
+            background-color: #6c757d;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        /* --- Sección de Explicación --- */
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e9f5ff;
+            border-left: 5px solid #007bff;
+            border-radius: 8px;
+            text-align: left;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .explanation.correct {
+            background-color: #e4f8e9;
+            border-left-color: #28a745;
+        }
+        
+        .explanation strong {
+            color: #1a2a6c;
+        }
+
+        .explanation.correct strong {
+            color: #155724;
+        }
+
+        /* --- Cita Final --- */
+        blockquote {
+            margin-top: 30px;
+            padding: 15px;
+            border-left: 5px solid #1a2a6c;
+            background-color: #f9f9f9;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        blockquote footer {
+            margin-top: 10px;
+            font-style: normal;
+            font-weight: bold;
+            text-align: right;
+            color: #333;
+        }
+        
+        /* --- Animaciones --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Página 1: Introducción -->
+        <div id="page-intro" class="page">
+            <div class="logo-container">
+                <svg class="logo-svg" viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#3498db;stop-opacity:1" /><stop offset="100%" style="stop-color:#9b59b6;stop-opacity:1" /></linearGradient></defs>
+                    <path fill="url(#brainGradient)" d="M60,115 C20,115 10,80 30,50 C40,30 50,10 70,10 C80,10 80,30 80,50 C80,70 75,90 70,110 L70,130 L60,115z"></path>
+                    <path fill="url(#brainGradient)" d="M100,115 C140,115 150,80 130,50 C120,30 110,10 90,10 C80,10 80,30 80,50 C80,70 85,90 90,110 L90,130 L100,115z"></path>
+                    <path stroke="white" stroke-width="5" fill="none" d="M70,40 C60,50 60,60 70,70 M60,80 C55,90 60,100 70,105 M90,40 C100,50 100,60 90,70 M100,80 C105,90 100,100 90,105 M80,15 L80,130"></path>
+                </svg>
+                <p class="logo-text">Hackea tu mente</p>
+                <p class="logo-tagline">Conéctate con tu mejor herramienta</p>
+            </div>
+            <h1>Tu Cerebro en Acción</h1>
+            <p>Responde los siguientes escenarios con tu primera impresión, ¡sin pensarlo demasiado!</p>
+            <button onclick="showPage('page-scenario-1')">Comenzar</button>
+        </div>
+
+        <!-- Página 2: Escenario 1 (El Bate y la Pelota) -->
+        <div id="page-scenario-1" class="page hidden">
+            <div class="logo-container">
+                 <svg class="logo-svg" viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#3498db;stop-opacity:1" /><stop offset="100%" style="stop-color:#9b59b6;stop-opacity:1" /></linearGradient></defs>
+                    <path fill="url(#brainGradient)" d="M60,115 C20,115 10,80 30,50 C40,30 50,10 70,10 C80,10 80,30 80,50 C80,70 75,90 70,110 L70,130 L60,115z"></path>
+                    <path fill="url(#brainGradient)" d="M100,115 C140,115 150,80 130,50 C120,30 110,10 90,10 C80,10 80,30 80,50 C80,70 85,90 90,110 L90,130 L100,115z"></path>
+                    <path stroke="white" stroke-width="5" fill="none" d="M70,40 C60,50 60,60 70,70 M60,80 C55,90 60,100 70,105 M90,40 C100,50 100,60 90,70 M100,80 C105,90 100,100 90,105 M80,15 L80,130"></path>
+                </svg>
+            </div>
+            <h2>Escenario 1: El Acertijo</h2>
+            <p>"Un bate y una pelota cuestan 1,10$ en total. El bate cuesta 1$ más que la pelota. ¿Cuánto cuesta la pelota?"</p>
+            <input type="text" id="answer1" placeholder="Escribe tu respuesta aquí (ej: 0.10)">
+            <br>
+            <button id="btn-check1" onclick="checkAnswer1()">Revisar mi respuesta</button>
+            <div id="explanation-1" class="explanation hidden"></div>
+            <div class="nav-container">
+                <button class="btn-back" onclick="showPage('page-intro')">« Regresar</button>
+                <button id="btn-next-1" class="hidden" onclick="showPage('page-scenario-2')">SIGUIENTE »</button>
+            </div>
+        </div>
+
+        <!-- Página 3: Escenario 2 (La Emoción) -->
+        <div id="page-scenario-2" class="page hidden">
+            <div class="logo-container">
+                 <svg class="logo-svg" viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#3498db;stop-opacity:1" /><stop offset="100%" style="stop-color:#9b59b6;stop-opacity:1" /></linearGradient></defs>
+                    <path fill="url(#brainGradient)" d="M60,115 C20,115 10,80 30,50 C40,30 50,10 70,10 C80,10 80,30 80,50 C80,70 75,90 70,110 L70,130 L60,115z"></path>
+                    <path fill="url(#brainGradient)" d="M100,115 C140,115 150,80 130,50 C120,30 110,10 90,10 C80,10 80,30 80,50 C80,70 85,90 90,110 L90,130 L100,115z"></path>
+                    <path stroke="white" stroke-width="5" fill="none" d="M70,40 C60,50 60,60 70,70 M60,80 C55,90 60,100 70,105 M90,40 C100,50 100,60 90,70 M100,80 C105,90 100,100 90,105 M80,15 L80,130"></path>
+                </svg>
+            </div>
+            <h2>Escenario 2: La Emoción Instantánea</h2>
+            <p>Mira la siguiente imagen y elige la emoción que crees que transmite.</p>
+            <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAxIDAgMCAyMCAxMCAxMCAwIDAgMCAwLTIwem0wIDJBNy45OSA3Ljk5IDAgMCAxIDE5LjE3IDEySDQuODNBNy45OSA3Ljk5IDAgMCAxIDEyIDR6TTguNSA5YTEuNSAxLjUgMCAxIDEgMCAzIDEuNSAxLjUgMCAwIDEgMC0zem03IDBhMS41IDEuNSAwIDEgMSAwIDMgMS41IDEuNSAwIDAgMSAwLTN6bS0zLjUgNmExLjUgMS41IDAgMSAxIDAgMyAxLjUgMS41IDAgMCAxIDAtM3oiIGZpbGw9IiMzNDM0MzQiLz48L3N2Zz4=" alt="Icono de una cara con expresión de sorpresa" width="150" style="margin-top: 15px;">
+            <div id="emotion-buttons-container" class="emotion-buttons">
+                <button onclick="checkAnswer2('Enojo')">Enojo</button>
+                <button onclick="checkAnswer2('Alegría')">Alegría</button>
+                <button onclick="checkAnswer2('Tristeza')">Tristeza</button>
+                <button onclick="checkAnswer2('Sorpresa')">Sorpresa</button>
+            </div>
+            <div id="explanation-2" class="explanation hidden"></div>
+            <div class="nav-container">
+                <button class="btn-back" onclick="showPage('page-scenario-1')">« Regresar</button>
+                <button id="btn-next-2" class="hidden" onclick="showPage('page-final')">Ver Reflexión Final »</button>
+            </div>
+        </div>
+
+        <!-- Página 4: Sección Final y Cita -->
+        <div id="page-final" class="page hidden">
+             <div class="logo-container">
+                 <svg class="logo-svg" viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+                    <defs><linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#3498db;stop-opacity:1" /><stop offset="100%" style="stop-color:#9b59b6;stop-opacity:1" /></linearGradient></defs>
+                    <path fill="url(#brainGradient)" d="M60,115 C20,115 10,80 30,50 C40,30 50,10 70,10 C80,10 80,30 80,50 C80,70 75,90 70,110 L70,130 L60,115z"></path>
+                    <path fill="url(#brainGradient)" d="M100,115 C140,115 150,80 130,50 C120,30 110,10 90,10 C80,10 80,30 80,50 C80,70 85,90 90,110 L90,130 L100,115z"></path>
+                    <path stroke="white" stroke-width="5" fill="none" d="M70,40 C60,50 60,60 70,70 M60,80 C55,90 60,100 70,105 M90,40 C100,50 100,60 90,70 M100,80 C105,90 100,100 90,105 M80,15 L80,130"></path>
+                </svg>
+            </div>
+            <h2>Reflexión Final</h2>
+            <p>Como has visto, nuestro cerebro a menudo salta a conclusiones rápidas y automáticas. Este es el <strong>Cerebro Reactivo</strong> (Sistema 1 de Kahneman) en acción.</p>
+            <p>El <strong>Cerebro Reflexivo</strong> (Sistema 2) es más lento y analítico. Nos permite corregir esos impulsos y pensar críticamente. La clave está en saber cuándo pausar y activarlo.</p>
+            <blockquote>
+                "El pensamiento perezoso es un vicio moral y una imprudencia práctica."
+                <footer>- Daniel Kahneman</footer>
+            </blockquote>
+            <button class="btn-back" style="margin-top: 30px;" onclick="resetAndShowIntro()">Volver al Inicio</button>
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+
+            const nextPage = document.getElementById(pageId);
+            if (nextPage) {
+                nextPage.classList.remove('hidden');
+            }
+        }
+
+        function checkAnswer1() {
+            const userAnswer = document.getElementById('answer1').value.trim().replace(',', '.');
+            const explanationDiv = document.getElementById('explanation-1');
+            let explanationHTML = '';
+            
+            explanationDiv.classList.remove('correct');
+
+            if (userAnswer === "0.05" || userAnswer === ".05") {
+                explanationDiv.classList.add('correct');
+                explanationHTML = `
+                    <strong>¡Felicitaciones! Respuesta Correcta.</strong><br>
+                    ¡Has acertado! Resististe el impulso inicial y usaste tu <strong>Cerebro Reflexivo</strong>.`;
+            } else if (userAnswer === "0.10" || userAnswer === ".10") {
+                explanationHTML = `
+                    <strong>¡Esa es la respuesta intuitiva más común!</strong><br>
+                    Tu Cerebro Reactivo hizo una resta rápida y cayó en la trampa. ¡No te preocupes, es normal!<br><br>
+                    <strong>La respuesta correcta es 0,05$.</strong>`;
+            } else {
+                 explanationHTML = `
+                    <strong>Respuesta registrada.</strong><br>
+                    La respuesta intuitiva común es 0.10$, pero la correcta es <strong>0.05$</strong>.`;
+            }
+            
+            explanationDiv.innerHTML = explanationHTML;
+            explanationDiv.classList.remove('hidden');
+
+            document.getElementById('btn-check1').style.display = 'none';
+            document.getElementById('btn-next-1').classList.remove('hidden');
+        }
+
+        function checkAnswer2(emotion) {
+            const explanationDiv = document.getElementById('explanation-2');
+            let explanationHTML = '';
+            
+            explanationDiv.classList.remove('correct');
+
+            if (emotion === 'Sorpresa') {
+                explanationDiv.classList.add('correct');
+                explanationHTML = `
+                    <strong>¡Felicitaciones, has acertado!</strong><br>
+                    La emoción es <strong>Sorpresa</strong>. Tu Cerebro Reactivo es un experto en reconocer estas expresiones de forma casi instantánea.`;
+            } else {
+                explanationHTML = `
+                    <strong>Respondiste ${emotion}.</strong><br>
+                    La emoción predominante que la mayoría identifica es <strong>Sorpresa</strong>. Nuestro cerebro está programado para este tipo de reconocimiento facial rápido.`;
+            }
+            
+            explanationDiv.innerHTML = explanationHTML;
+            explanationDiv.classList.remove('hidden');
+            
+            document.getElementById('emotion-buttons-container').style.display = 'none';
+            document.getElementById('btn-next-2').classList.remove('hidden');
+        }
+
+        function resetAndShowIntro() {
+            // Resetear Escenario 1
+            document.getElementById('answer1').value = '';
+            document.getElementById('explanation-1').classList.add('hidden');
+            document.getElementById('btn-check1').style.display = 'inline-block';
+            document.getElementById('btn-next-1').classList.add('hidden');
+
+            // Resetear Escenario 2
+            document.getElementById('explanation-2').classList.add('hidden');
+            document.getElementById('emotion-buttons-container').style.display = 'block';
+            document.getElementById('btn-next-2').classList.add('hidden');
+
+            showPage('page-intro');
+        }
+    </script>
+
+</body>
+</html>

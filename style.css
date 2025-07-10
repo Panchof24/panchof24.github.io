@@ -1,0 +1,276 @@
+/* -- Estilos Generales -- */
+:root {
+    --color-primario-gradient-start: #4facfe; /* Azul vibrante */
+    --color-primario-gradient-end: #00c6fb; /* Púrpura intenso */
+    --color-blanco: #FFFFFF;
+    --color-negro-titulo: #000000;
+    --color-gris-slogan: #666666;
+    --color-acento-recursos: #007bff; /* Un azul más para enlaces de recursos */
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-blanco);
+    color: #333333; /* Gris oscuro para texto general */
+    line-height: 1.6;
+    text-align: center; /* Centrar todo por defecto */
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px; /* Mayor control sobre el ancho máximo */
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* -- Encabezado con Logo Protagonista -- */
+.main-header {
+    padding: 60px 0; /* Más espacio vertical */
+    text-align: center;
+    position: relative; /* Para posicionar el botón flotante correctamente */
+    z-index: 20; /* Asegurar que el header y botón estén por encima del resto si algo se desborda */
+}
+
+.logo-container {
+    margin-bottom: 30px; /* Más espacio debajo del logo */
+    position: relative;
+}
+
+.hero-logo {
+    width: 65%; /* El logo ahora ocupará el 65% del ancho del contenedor (aproximadamente un 30% más grande que el 50%) */
+    max-width: 390px; /* Max-width ajustado proporcionalmente para el nuevo width */
+    height: auto;
+    display: block; /* Permite centrarlo con margin: auto */
+    margin: 0 auto; /* Centrar el logo */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Sombra sutil para darle profundidad */
+    border-radius: 15px; /* Bordes ligeramente redondeados */
+}
+
+/* ESTILOS PARA EL BOTÓN "COLAPSAR TODO" EN LA CABECERA (POSICIONADO A LA DERECHA) */
+.collapse-container {
+    width: 100%; /* Ocupa todo el ancho para poder posicionar el botón */
+    max-width: 1000px; /* Alineado al ancho del contenido principal */
+    margin: 0 auto; /* Centrar el container del botón */
+    text-align: right; /* Empuja el botón hacia la derecha */
+    position: relative;
+    padding-right: 5%; /* Asegura que haya un pequeño espacio respecto al borde derecho del container principal */
+    margin-top: -10px; /* Ajuste vertical pequeño para que quede más alineado con la parte inferior del logo grande */
+    margin-bottom: 10px; /* Espacio debajo del botón */
+    z-index: 30; /* Asegurar que el botón esté encima de cualquier otro elemento si hay superposición */
+}
+
+.btn-collapse-all-custom {
+    display: inline-block; /* Ocupa el espacio justo necesario */
+    padding: 8px 15px; /* Tamaño pequeño pero manejable */
+    background-color: #f8f8f8; /* Fondo ligero */
+    color: #333333; /* Color del texto */
+    border: 1px solid #ddd; /* Borde sutil */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 0.9em; /* Tamaño de fuente un poco menor */
+    font-weight: 600; /* Letra semigruesa */
+    cursor: pointer; /* Indica que es clickeable */
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; /* Transición suave */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* Sombra muy discreta */
+}
+
+.btn-collapse-all-custom:hover {
+    background-color: #e0e0e0; /* Color de fondo más oscuro al pasar el mouse */
+    color: #000000; /* Texto más oscuro */
+    border-color: #ccc; /* Borde un poco más oscuro */
+}
+
+
+/* -- Contenido Principal de Secciones Desplegables -- */
+.main-content {
+    margin-top: 50px; /* Espacio entre el header y el contenido */
+}
+
+.breadcrumb {
+    font-size: 0.9em;
+    color: #888888; /* Un gris un poco más claro */
+    margin-bottom: 40px;
+    text-align: left; /* Alineado a la izquierda para una mejor lectura */
+    padding-left: 5%; /* Un poco de padding a la izquierda */
+}
+
+.content-section {
+    margin-bottom: 30px; /* Más separación entre secciones */
+    border: 1px solid #eee;
+    border-radius: 10px;
+    overflow: hidden; /* Importante para bordes redondeados y transiciones */
+    background-color: var(--color-blanco);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Sombra suave */
+}
+
+.section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6em; /* Tamaño de fuente reducido */
+    font-weight: 700;
+    background-color: #FAFAFA; /* Fondo ligeramente diferente para los títulos */
+    color: var(--color-negro-titulo);
+    padding: 20px 30px; /* Padding para dar espacio */
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    /* Alineación izquierda y Centrado vertical */
+    justify-content: flex-start; /* Alinea el contenido a la izquierda */
+    text-align: left; /* Asegura que el texto esté a la izquierda */
+    align-items: center; /* Centra verticalmente el ícono y el texto */
+}
+
+.section-title::before { /* Estilo para el ícono '+' o '-' */
+    content: '+';
+    font-size: 1.2em; /* Tamaño de fuente para el ícono */
+    margin-right: 20px; /* Espacio entre el ícono y el texto */
+    color: var(--color-negro-titulo);
+    transition: transform 0.3s ease;
+}
+
+.section-title.expanded::before {
+    content: '−';
+}
+
+/* --- MODIFICADO: ESTILOS PARA EL CONTENIDO DE LAS SECCIONES DESPLEGABLES --- */
+.section-content {
+    padding: 0; /* Eliminamos padding aquí, lo damos al contenedor interno */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+    background-color: var(--color-blanco); /* Fondo del contenido */
+}
+
+.section-content > div { /* Un contenedor interno para aplicar padding al contenido */
+    padding: 20px; /* Añadimos padding a los lados para una mejor lectura */
+    box-sizing: border-box; /* Incluye el padding en el tamaño total */
+    text-align: left; /* Alineación general del texto a la izquierda */
+    /* Aquí definimos cómo se justifica el texto y los márgenes */
+}
+
+.section-content p {
+    margin-bottom: 15px; /* Margen entre párrafos para mejor espaciado vertical */
+    font-size: 1.1em; /* Texto más grande para mayor legibilidad */
+    text-align: justify; /* Justifica el texto para alinearlo en ambos lados */
+    /* margin-left: 30px; */ /* No necesitamos margen lateral si el padding del div contenedor ya lo da */
+}
+
+.section-content h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4em; /* Tamaño de fuente para títulos de recursos */
+    color: var(--color-negro-titulo);
+    margin-bottom: 15px; /* Margen inferior para separar del resto del contenido */
+    border-bottom: 2px solid #eee; /* Línea inferior para separar visualmente */
+    padding-bottom: 5px; /* Espacio debajo del texto y antes de la línea */
+    /* Ya está alineado a la izquierda por el div padre (.section-content > div) */
+}
+
+/* -- Estilos para Recursos -- */
+.resources ul {
+    list-style: none;
+    padding: 0;
+    text-align: left; /* Contenedor de recursos a la izquierda */
+}
+
+.resources li {
+    margin-bottom: 12px;
+}
+
+.resource-link {
+    font-size: 1.1em;
+    color: var(--color-acento-recursos);
+    text-decoration: none;
+    font-weight: 600; /* Más énfasis en los links de recursos */
+    display: inline-block;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.resource-link:hover {
+    color: #0056b3; /* Un tono más oscuro al pasar el mouse */
+    text-decoration: underline;
+}
+
+/* -- Pie de Página -- */
+footer {
+    background-color: #f8f8f8;
+    padding: 50px 0;
+    margin-top: 60px; /* Espacio desde el contenido */
+    border-top: 1px solid #eee;
+}
+
+.social-media {
+    margin-bottom: 20px;
+}
+
+.social-media a {
+    color: #666666; /* Gris para los íconos */
+    font-size: 30px; /* Íconos más grandes */
+    margin: 0 15px; /* Espacio entre íconos */
+    transition: color 0.3s ease;
+    text-decoration: none; /* Sin subrayado por defecto */
+    display: inline-block; /* Para que el margen funcione */
+}
+
+.social-media a:hover {
+    color: var(--color-negro-titulo); /* Negro al pasar el mouse */
+}
+
+.footer-text {
+    font-size: 0.9em;
+    color: #888888;
+    margin: 0;
+}
+
+/* -- Responsive Design -- */
+@media (max-width: 768px) {
+    .main-header {
+        padding: 40px 0;
+    }
+    .hero-logo {
+        width: 70%; /* El logo es un poco más grande en móviles */
+        max-width: 250px;
+    }
+    .breadcrumb {
+        text-align: center;
+        padding-left: 0;
+    }
+    /* --- AJUSTES EN EL RESPONSIVE PARA LOS TÍTULOS DE UNIDAD --- */
+    .section-title {
+        font-size: 1.5em; /* Tamaño de fuente más pequeño en móviles */
+        padding: 15px 20px; /* Padding ajustado para móviles */
+        justify-content: flex-start; /* Asegura la alineación izquierda */
+        text-align: left; /* Asegura alineación de texto */
+    }
+    .section-title::before {
+        font-size: 1.1em; /* Tamaño del ícono */
+        margin-right: 15px; /* Espacio entre ícono y texto */
+    }
+    /* --- AJUSTE DEL BOTÓN COLAPSAR TODO EN RESPONSIVE --- */
+    .collapse-container {
+        margin-top: 0; /* Eliminar el ajuste de margin-top en móviles */
+        margin-bottom: 15px; /* Aumentar margen debajo del botón en móviles */
+        padding-right: 0; /* Remover padding derecho que era para desktop */
+        text-align: center; /* Centrar el botón en móviles */
+    }
+    .btn-collapse-all-custom {
+        font-size: 0.9em;
+        padding: 8px 15px;
+    }
+    /* --- FIN AJUSTE BOTÓN RESPONSIVE --- */
+
+    .section-content p, .resource-link {
+        font-size: 1em;
+    }
+    .section-content h3 {
+        font-size: 1.3em;
+    }
+    .social-media a {
+        font-size: 24px;
+        margin: 0 10px;
+    }
+    footer {
+        padding: 30px 0;
+        margin-top: 40px;
+    }
+}

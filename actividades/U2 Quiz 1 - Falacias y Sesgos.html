@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIDAD 2 – Falacias y Sesgos - Juego Interactivo Avanzado</title>
+    <style>
+        /* Variables de CSS para facilitar la personalización */
+        :root {
+            --primary-color: #2980b9; /* Azul principal */
+            --secondary-color: #1a5276; /* Azul marino oscuro */
+            --background-color: #eaf2f8; /* Fondo claro azul */
+            --text-color: #34495e; /* Color de texto principal */
+            --feedback-correct-bg: #2ecc71; /* Verde para aciertos */
+            --feedback-incorrect-bg: #e74c3c; /* Rojo para errores */
+            --button-hover-bg: #3498db;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --border-radius: 8px;
+            --logo-size: 120px;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 35px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: var(--logo-size);
+            height: auto;
+            border-radius: calc(var(--border-radius) / 2);
+            object-fit: contain; /* Asegura que el logo se ajuste sin deformarse */
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .game-section {
+            margin-top: 30px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .game-section.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none; /* Evita interacciones cuando está oculto */
+        }
+
+        #instructions, #game-over-message {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        #game-over-message {
+            font-size: 1.8em;
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .scenario-card {
+            background-color: var(--background-color);
+            padding: 30px;
+            border-left: 6px solid var(--primary-color);
+            margin-bottom: 30px;
+            text-align: left;
+            border-radius: var(--border-radius);
+            font-size: 1.15em;
+            color: var(--text-color);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        #question-progress {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 10px;
+            text-align: right;
+            padding: 0 10px;
+        }
+
+        .options-container {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1.15em;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: 600;
+            width: 200px; /* Ancho fijo para botones de respuesta */
+        }
+
+        button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .feedback-box {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            font-size: 1.05em;
+            text-align: left;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 1;
+            transform: translateY(0);
+            border: 1px solid transparent; /* Borde para 'correct' e 'incorrect' */
+        }
+
+        .feedback-box.hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+        }
+
+        .feedback-box.correct {
+            background-color: var(--feedback-correct-bg);
+            color: white;
+            border-color: #27ae60; /* Borde más oscuro para contraste */
+        }
+
+        .feedback-box.incorrect {
+            background-color: var(--feedback-incorrect-bg);
+            color: white;
+            border-color: #c0392b; /* Borde más oscuro para contraste */
+        }
+
+        #explanation-detail {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9); /* Texto ligeramente más tenue en la retroalimentación */
+            margin-top: 15px;
+            line-height: 1.8;
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* Separador visual */
+            padding-top: 10px;
+        }
+
+        #score-display {
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #f0f4f8; /* Fondo para destacar la puntuación */
+            border-radius: var(--border-radius);
+        }
+
+        #level-display {
+            font-size: 1.1em;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="LOGO OFICIAL.png" alt="Logo del Curso" class="logo">
+
+        <h1>UNIDAD 2 – Falacias y Sesgos</h1>
+        <h2>¡Desafía tu Mente!</h2>
+
+        <!-- Pantalla de Inicio e Instrucciones -->
+        <div id="instructions-section" class="game-section">
+            <div id="instructions">
+                <h3>¡Bienvenido al Juego Interactivo de Falacias y Sesgos!</h3>
+                <p>En esta unidad, has aprendido a identificar las trampas del pensamiento. Este juego te ayudará a poner a prueba tus habilidades.</p>
+                <ul>
+                    <li><strong>Objetivo:</strong> Lee el escenario presentado y decide si se trata de una <strong>Falacia</strong> o un <strong>Sesgo</strong>.</li>
+                    <li><strong>Cómo Jugar:</strong> Selecciona una de las opciones de respuesta. Recibirás retroalimentación inmediata.</li>
+                    <li><strong>Puntuación:</strong> Se registrará tu desempeño para ayudarte a medir tu progreso.</li>
+                </ul>
+                <p>¡Prepárate para hackear tu mente y pensar con mayor claridad!</p>
+            </div>
+            <button id="start-game-btn" onclick="startGame()">Comenzar el Juego</button>
+        </div>
+
+        <!-- Área Principal del Juego -->
+        <div id="game-area" class="game-section hidden">
+            <div id="question-progress"></div>
+            <div class="scenario-card" id="scenario-text"></div>
+
+            <div class="options-container">
+                <button class="answer-btn" data-answer="falacia">Falacia</button>
+                <button class="answer-btn" data-answer="sesgo">Sesgo</button>
+                <button class="answer-btn" data-answer="ninguno">Ninguno</button>
+            </div>
+
+            <div id="feedback-area" class="feedback-box hidden">
+                <div id="feedback-message"></div>
+                <div id="explanation-detail"></div>
+            </div>
+
+            <div id="score-area" class="hidden">
+                <div id="score-display"></div>
+                <div id="level-display"></div>
+            </div>
+
+            <div class="options-container">
+                <button id="next-question-btn" class="hidden" onclick="nextQuestion()">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Fin del Juego -->
+        <div id="game-over-section" class="game-section hidden">
+            <div id="game-over-message">
+                <!-- Mensaje final se genera aquí -->
+            </div>
+            <div class="options-container">
+                <button onclick="restartGame()">Jugar de Nuevo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio (Placeholder - requiere archivos de audio reales) -->
+    <audio id="correct-sound" src="correct.wav" preload="auto"></audio>
+    <audio id="incorrect-sound" src="incorrect.wav" preload="auto"></audio>
+
+    <script>
+        // --- Datos de las Preguntas ---
+        // NOTA: La IA ha generado ejemplos. ES FUNDAMENTAL que el instructor revise y
+        // adapte estas preguntas y explicaciones para que coincidan exactamente
+        // con el contenido de la "UNIDAD 2".
+        const questionsData = [
+            {
+                id: 1,
+                scenario: "Tu amigo te dice: 'No deberías comer carne, es malo para el planeta', pero él mismo usa mucho el coche para ir a comprar el pan.",
+                answer: "falacia",
+                type: "Falacia Ad Hominem Circunstancial (Hipocresía)",
+                explanation: "Se ataca la inconsistencia de la persona en lugar del argumento. Aunque su inconsistencia es notable, no invalida intrínsecamente su argumento sobre el impacto ambiental de la carne."
+            },
+            {
+                id: 2,
+                scenario: "Después de leer varios artículos positivos sobre un nuevo suplemento vitamínico, decides comprarlo, ignorando las advertencias médicas sobre sus posibles efectos secundarios.",
+                answer: "sesgo",
+                type: "Sesgo de Confirmación",
+                explanation: "Buscas e interpretas información de manera que confirme tus creencias preexistentes o tus deseos, ignorando la información que las contradice."
+            },
+            {
+                id: 3,
+                scenario: "Un político argumenta: 'Debemos aumentar los impuestos a las empresas para mejorar los servicios públicos'. Su oponente responde: 'Tú solo quieres arruinar la economía y empobrecer a la gente'.",
+                answer: "falacia",
+                type: "Falacia del Hombre de Paja (Straw Man)",
+                explanation: "Se distorsiona o exagera el argumento del oponente para que sea más fácil atacarlo, en lugar de abordar el argumento original."
+            },
+            {
+                id: 4,
+                scenario: "Te sientes muy seguro de tu capacidad para predecir el resultado de un partido de fútbol, a pesar de que nunca has jugado o estudiado el deporte a fondo.",
+                answer: "sesgo",
+                type: "Sesgo de Exceso de Confianza (Overconfidence Bias)",
+                explanation: "Tendencia a sobreestimar nuestras propias habilidades, conocimientos o juicios."
+            },
+            {
+                id: 5,
+                scenario: "En un debate, alguien dice: 'Todos mis amigos están de acuerdo en que esta nueva ley es terrible, así que debe serlo'.",
+                answer: "falacia",
+                type: "Falacia Ad Populum (Apelación al Pueblo/Consenso)",
+                explanation: "Se argumenta que algo es cierto o bueno porque mucha gente lo cree, en lugar de ofrecer evidencia sólida."
+            },
+            {
+                id: 6,
+                scenario: "Has estado buscando un coche rojo y, de repente, empiezas a ver coches rojos por todas partes. ¿Empiezan a aparecer más coches rojos o simplemente te has fijado más en ellos?",
+                answer: "sesgo",
+                type: "Efecto de Frecuencia / Sesgo de Atención Selectiva",
+                explanation: "Una vez que diriges tu atención a algo, tiendes a notarlo más. Tu cerebro lo detecta más fácilmente, haciendo que parezca más común de lo que realmente es."
+            },
+            {
+                id: 7,
+                scenario: "Dices: 'Si no apoyas esta propuesta, entonces eres un enemigo de la nación'.",
+                answer: "falacia",
+                type: "Falsa Dicotomía (o Falso Dilema)",
+                explanation: "Se presentan solo dos opciones como las únicas posibles, cuando en realidad existen más alternativas."
+            },
+            {
+                id: 8,
+                scenario: "Alguien afirma: 'Nadie ha podido demostrar que los fantasmas no existen, por lo tanto, los fantasmas existen'.",
+                answer: "falacia",
+                type: "Falacia Ad Ignorantiam (Apelación a la Ignorancia)",
+                explanation: "Se argumenta que algo es verdadero porque no se ha demostrado que sea falso, o viceversa."
+            },
+            {
+                id: 9,
+                scenario: "Un chef famoso recomienda una marca de ollas, y asumes que deben ser las mejores para cocinar, sin considerar si su experiencia es relevante para el tipo de cocina que haces.",
+                answer: "falacia",
+                type: "Falacia de Apelación a la Autoridad Irrelevante",
+                explanation: "Se apela a la autoridad de alguien que no es un experto en el tema en cuestión, o cuya autoridad en el tema no es garantía de veracidad."
+            },
+            {
+                id: 10,
+                scenario: "Después de una experiencia muy negativa con un producto de una marca, evitas comprar cualquier cosa de esa marca, incluso si han mejorado sus productos.",
+                answer: "sesgo",
+                type: "Sesgo de Aversión a la Pérdida (y Sesgo de Anclaje en la primera impresión)",
+                explanation: "Tendemos a preferir evitar pérdidas a obtener ganancias equivalentes. La mala primera impresión (anclaje) puede influir en decisiones futuras de forma desproporcionada."
+            },
+            {
+                id: 11,
+                scenario: "Te han dicho que es imposible aprender un idioma nuevo en 3 meses. Si intentas aprenderlo, es muy probable que, al encontrar dificultades, pienses 'esto es imposible como me dijeron'.",
+                answer: "sesgo",
+                type: "Sesgo de Confirmación (activado por una creencia previa)",
+                explanation: "Buscas e interpretas activamente la información que respalda tu creencia inicial, incluso si hay evidencia en contra."
+            },
+             {
+                id: 12,
+                scenario: "Un político promueve una política dizendo que si se permite algo pequeño (ej. un aumento mínimo de impuestos), inevitablemente conducirá a consecuencias catastróficas (ej. el colapso económico total).",
+                answer: "falacia",
+                type: "Falacia de la Pendiente Resbaladiza (Slippery Slope)",
+                explanation: "Se argumenta que una acción inicial, por pequeña que sea, inevitablemente conducirá a una cadena de eventos negativos y catastróficos, sin evidencia de que dicha cadena sea probable."
+            },
+            {
+                id: 13,
+                scenario: "Después de leer una noticia sobre un accidente aéreo, comienzas a sentir más miedo a volar que a conducir, aunque estadísticamente conducir es mucho más peligroso.",
+                answer: "sesgo",
+                type: "Sesgo de Disponibilidad",
+                explanation: "Sobreestimas la probabilidad de eventos que son fácilmente recordables o vívidos en tu mente (como la imagen de un accidente aéreo), ignorando datos estadísticos."
+            },
+            {
+                id: 14,
+                scenario: "Alguien dice: 'No hay evidencia de que el cambio climático sea causado por humanos, así que debe ser un ciclo natural sin intervención humana'.",
+                answer: "falacia",
+                type: "Falacia Ad Ignorantiam (Apelación a la Ignorancia)",
+                explanation: "Se usa la falta de prueba de algo como prueba de lo contrario, en lugar de basarse en la evidencia científica disponible."
+            },
+            {
+                id: 15,
+                scenario: "Cuando se te pide que evalúes tu habilidad para organizar eventos, te calificas a ti mismo como 'excelente', creyendo que eres significativamente mejor que la persona promedio.",
+                answer: "sesgo",
+                type: "Efecto Dunning-Kruger (en la parte de sobreestimación de habilidades)",
+                explanation: "Las personas con poca habilidad en un área tienden a sobreestimar su competencia, mientras que las personas altamente competentes tienden a subestimar la suya en comparación con los demás."
+            }
+            // Añadir más preguntas aquí siguiendo el mismo formato...
+        ];
+
+        // --- Variables del Juego ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let currentQuestion = null;
+
+        const questionsSection = document.getElementById('instructions-section');
+        const gameArea = document.getElementById('game-area');
+        const gameOverSection = document.getElementById('game-over-section');
+
+        const logoImg = document.querySelector('.logo');
+
+        const questionProgressDisplay = document.getElementById('question-progress');
+        const scenarioText = document.getElementById('scenario-text');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const explanationDetail = document.getElementById('explanation-detail');
+        const feedbackArea = document.getElementById('feedback-area');
+
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisplay = document.getElementById('level-display');
+        const scoreArea = document.getElementById('score-area');
+
+        const answerButtons = document.querySelectorAll('.answer-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+
+        const correctSound = document.getElementById('correct-sound');
+        const incorrectSound = document.getElementById('incorrect-sound');
+
+        // --- Funciones del Juego ---
+
+        function startGame() {
+            questionsSection.classList.add('hidden');
+            gameArea.classList.remove('hidden');
+            score = 0;
+            currentQuestionIndex = 0;
+            loadQuestion();
+            // Asegurar que el logo permanezca visible
+            logoImg.style.position = 'absolute';
+            logoImg.style.top = '25px';
+            logoImg.style.right = '25px';
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex < questionsData.length) {
+                currentQuestion = questionsData[currentQuestionIndex];
+                scenarioText.textContent = currentQuestion.scenario;
+                questionProgressDisplay.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questionsData.length}`;
+
+                // Resetear estado de la interfaz para la nueva pregunta
+                feedbackArea.classList.add('hidden');
+                nextQuestionBtn.classList.add('hidden');
+                answerButtons.forEach(button => {
+                    button.disabled = false; // Habilitar botones de respuesta
+                    button.style.display = ''; // Mostrar botones de respuesta
+                    button.classList.remove('correct', 'incorrect'); // Limpiar estilos
+                });
+                scoreArea.classList.add('hidden'); // Ocultar área de puntuación hasta el final
+            } else {
+                endGame();
+            }
+        }
+
+        function checkAnswer(userAnswer) {
+            let isCorrect = (userAnswer === currentQuestion.answer);
+            let message = '';
+            let feedbackClass = '';
+
+            if (isCorrect) {
+                score++;
+                message = "¡Correcto!";
+                feedbackClass = 'correct';
+                if (correctSound) correctSound.play();
+            } else {
+                message = "Incorrecto.";
+                feedbackClass = 'incorrect';
+                if (incorrectSound) incorrectSound.play();
+            }
+
+            feedbackMessage.textContent = message;
+            explanationDetail.textContent = `Respuesta correcta: ${currentQuestion.type}\n\n${currentQuestion.explanation}`;
+            feedbackArea.classList.remove('hidden');
+            feedbackArea.classList.remove('correct', 'incorrect'); // Limpiar clases previas
+            feedbackArea.classList.add(feedbackClass);
+
+            // Deshabilitar botones de respuesta y ocultarlos
+            answerButtons.forEach(button => {
+                button.disabled = true;
+                button.style.display = 'none';
+            });
+            nextQuestionBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function endGame() {
+            gameArea.classList.add('hidden');
+            gameOverSection.classList.remove('hidden');
+
+            const totalQuestions = questionsData.length;
+            const percentage = (score / totalQuestions) * 100;
+            let level = '';
+
+            if (percentage >= 90) level = "¡Maestro del Pensamiento Crítico!";
+            else if (percentage >= 75) level = "¡Experto en Falacias y Sesgos!";
+            else if (percentage >= 60) level = "¡Aprendiz Avanzado!";
+            else if (percentage >= 40) level = "¡Estudiante Consciente!";
+            else level = "¡Principiante en Proceso!";
+
+            document.getElementById('game-over-message').innerHTML = `
+                <h2>¡Juego Finalizado!</h2>
+                <p>Has completado el desafío de la UNIDAD 2.</p>
+                <p>Tu puntuación final es: <strong>${score} de ${totalQuestions}</strong> (${percentage.toFixed(1)}%)</p>
+                <p>Nivel: <strong>${level}</strong></p>
+                <p>¡Sigue practicando para fortalecer tu pensamiento crítico!</p>
+            `;
+        }
+
+        function restartGame() {
+            gameOverSection.classList.add('hidden');
+            questionsSection.classList.remove('hidden');
+            score = 0;
+            currentQuestionIndex = 0;
+            // Reiniciar el logo si fuera necesario, pero en este caso estará visible
+        }
+
+        // --- Inicialización ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Preparar el logo (asegurarse de que la ruta es correcta)
+            logoImg.onerror = function() {
+                console.warn("LOGO OFICIAL.png no encontrado. Asegúrate de que el archivo esté en la misma carpeta.");
+                // Opcional: Ocultar o mostrar un placeholder si el logo no se carga
+            };
+        });
+
+        // Añadir event listeners a los botones de respuesta
+        answerButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                checkAnswer(button.getAttribute('data-answer'));
+            });
+        });
+    </script>
+
+</body>
+</html>

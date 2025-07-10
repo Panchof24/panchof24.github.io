@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explora Tus Emociones</title>
+    <style>
+        /* --- Variables de Diseño y Colores --- */
+        :root {
+            --gradient-start: #00c6ff; /* Azul vibrante */
+            --gradient-end: #a200d4;   /* Morado intenso */
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --card-bg: #f9f9f9; /* Fondo suave para tarjetas */
+            --border-color: #eee;
+            --primary-action-color: #4CAF50; /* Verde para botones principales */
+            --primary-action-hover-color: #45a049;
+            --light-gradient-bg: linear-gradient(to bottom right, #f0f8ff, #e6e6fa); /* Fondo general suave */
+        }
+
+        /* --- Estilos Generales del Cuerpo --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--light-gradient-bg); /* Fondo suave */
+            color: var(--text-color);
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- Contenedor Principal de la App --- */
+        .app-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+        }
+
+        /* --- Encabezado de la App (Logo, Título) --- */
+        .app-header .logo img {
+            width: 120px; /* Tamaño del logo */
+            height: 120px; /* Tamaño del logo */
+            margin-bottom: 15px;
+            display: block; /* Para centrar con margin auto */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .app-title {
+            font-size: 2.8em;
+            font-weight: 900; /* Más grueso */
+            margin-bottom: 5px;
+            /* Aplicar el gradiente del logo al texto */
+            background: -webkit-linear-gradient(left, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-subtitle {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 40px;
+        }
+
+        /* --- Estilos de los Pasos de la Interacción --- */
+        .step {
+            margin-top: 20px;
+            display: none; /* Oculto por defecto, se muestra con JS */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        .step.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step h2 {
+            font-size: 1.8em;
+            color: var(--gradient-start);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gradient-end); /* Línea decorativa */
+        }
+
+        .step p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        /* --- Área de Entrada de Texto --- */
+        #emotion-input {
+            width: calc(100% - 24px); /* Ajuste por padding y borde */
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            resize: vertical; /* Permite redimensionar verticalmente */
+            min-height: 80px;
+        }
+
+        /* --- Selector de Intensidad --- */
+        .intensity-selector {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* Para que se adapte a pantallas pequeñas */
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .intensity-selector label {
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: var(--text-color);
+        }
+
+        .intensity-selector input[type="range"] {
+            width: 200px; /* Ancho del slider */
+            cursor: pointer;
+            accent-color: var(--gradient-start); /* Colorea el slider */
+        }
+
+        #intensity-value {
+            font-size: 1.8em; /* Número de intensidad grande */
+            font-weight: bold;
+            color: var(--gradient-end);
+            margin-left: 15px;
+            min-width: 50px; /* Espacio para el número */
+            text-align: center;
+            display: inline-block;
+        }
+
+        /* --- Sección de Resultados --- */
+        .results {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            text-align: left; /* Alinea el texto de los resultados a la izquierda */
+        }
+
+        .results h3 {
+            color: var(--gradient-start);
+            margin-top: 0;
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .suggested-emotion {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--gradient-end);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .intensity-display {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            color: #555;
+            text-align: center;
+        }
+
+        .motivational-message {
+            font-size: 1.05em;
+            line-height: 1.7;
+            color: #444;
+            padding-left: 15px;
+            border-left: 4px solid var(--gradient-start); /* Línea lateral para el mensaje */
+            background-color: rgba(255, 255, 255, 0.7); /* Fondo semitransparente para legibilidad */
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        /* --- Estilos de Botones --- */
+        button {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4); /* Sombra que combina con el gradiente */
+        }
+
+        button:hover {
+            filter: brightness(1.1); /* Efecto al pasar el ratón */
+            box-shadow: 0 6px 20px rgba(0, 198, 255, 0.6);
+        }
+
+        /* --- Clase para ocultar elementos --- */
+        .hidden {
+            display: none;
+        }
+        
+        /* --- Media Query para pantallas pequeñas (móviles) --- */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 20px; /* Menos padding en móviles */
+            }
+            .app-title {
+                font-size: 2.2em; /* Título un poco más pequeño */
+            }
+            .app-subtitle {
+                font-size: 1.1em;
+            }
+            .intensity-selector {
+                flex-direction: column; /* Apila los elementos del selector */
+                align-items: flex-start;
+            }
+            .intensity-selector input[type="range"] {
+                width: 100%; /* Slider ocupa todo el ancho */
+                margin-top: 10px;
+            }
+            #intensity-value {
+                margin-left: 0;
+                margin-top: 10px; /* Espacio para el número */
+                width: 100%;
+            }
+            button {
+                font-size: 1em; /* Botón más pequeño */
+                padding: 12px 20px;
+            }
+            .logo img {
+                width: 100px; /* Logo más pequeño en móviles */
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <!-- Coloca tu logo aquí. Asegúrate de que el archivo se llame 'brain_logo.png' -->
+            <!-- y esté en la misma carpeta que este archivo HTML. -->
+            <div class="logo">
+                <img src="brain_logo.png" alt="Logo Hackea tu mente">
+            </div>
+            <h1 class="app-title">Hackea tu mente</h1>
+            <p class="app-subtitle">Conéctate con tu mejor herramienta</p>
+        </header>
+
+        <!-- Paso 1: Bienvenida y Descripción de Emoción -->
+        <div id="step1" class="step active">
+            <h2>¡Hola! 👋</h2>
+            <p>Por favor, describe cómo te sientes ahora mismo o una emoción que quieras explorar.</p>
+            <textarea id="emotion-input" rows="4" placeholder="Ej: Me siento un poco abrumado/a por el trabajo pendiente y no sé por dónde empezar..."></textarea>
+            <button onclick="handleStep1()">Continuar</button>
+        </div>
+
+        <!-- Paso 2: Selección de Intensidad -->
+        <div id="step2" class="step">
+            <h2>Evalúa la Intensidad</h2>
+            <p>Basado en tu descripción, hemos identificado una posible emoción.</p>
+            <div class="results">
+                <div id="suggested-emotion" class="suggested-emotion"></div>
+            </div>
+            <p>Ahora, en una escala del 1 al 5, ¿qué tan intensa es esta emoción para ti?</p>
+            <div class="intensity-selector">
+                <label for="intensity-range">Intensidad:</label>
+                <input type="range" id="intensity-range" min="1" max="5" value="3"> <!-- Valor por defecto -->
+                <span id="intensity-value">3</span> / 5 <!-- Muestra el valor seleccionado -->
+            </div>
+            <button onclick="handleStep2()">Ver resultado</button>
+        </div>
+
+        <!-- Paso 3: Resultados y Mensaje Motivador -->
+        <div id="step3" class="step">
+            <h2>Tu Emoción Explorada</h2>
+            <div class="results">
+                <div id="final-emotion-display" class="suggested-emotion"></div>
+                <div id="final-intensity-display" class="intensity-display"></div>
+                <div id="motivational-message" class="motivational-message"></div>
+            </div>
+            <button onclick="resetApp()">Explorar otra emoción</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- Datos de las Emociones y Mensajes --- */
+        const emotionsData = {
+            alegria: {
+                keywords: ["feliz", "contento", "alegre", "entusiasmado", "optimista", "divertido", "radiante", "gozo", "placer", "animado", "eufórico"],
+                messages: [
+                    "¡Fantástico! Tu alegría es un motor. Sigue cultivando esas sensaciones, son la chispa de la vida.", // 1
+                    "Tu alegría es notable. Permítete disfrutarla y compartirla, irradia luz a tu alrededor.", // 2
+                    "Sientes una alegría moderada. Reconoce los momentos que la provocan y busca repetirlos conscientemente.", // 3
+                    "Estás experimentando una gran alegría. Abraza esta felicidad y déjala llenar tu día con energía positiva.", // 4
+                    "¡Wow! Una alegría inmensa. Vive este momento plenamente, es un regalo precioso. ¡Celébralo!" // 5
+                ]
+            },
+            confianza: {
+                keywords: ["confiado", "seguro", "tranquilo", "esperanzado", "optimista", "cree en ti", "estable", "calma", "firme"],
+                messages: [
+                    "Te sientes un poco esperanzado/a. Mantén esa perspectiva, la confianza se construye día a día con pequeñas victorias.", // 1
+                    "Tu confianza es evidente. Sigue apoyándote en tus fortalezas, son tu mejor activo y te guiarán.", // 2
+                    "Sientes una confianza moderada. Es un buen momento para planificar y confiar en tus habilidades, eres capaz.", // 3
+                    "Tienes una fuerte sensación de seguridad. ¡Adelante! Tienes la capacidad para lograr lo que te propones con determinación.", // 4
+                    "¡Sientes una confianza total! Confía plenamente en ti y en tu camino, tu potencial es ilimitado." // 5
+                ]
+            },
+            miedo: {
+                keywords: ["miedo", "ansioso", "preocupado", "temeroso", "nervioso", "asustado", "incertidumbre", "agobio", "angustia", "pánico", "inquieto"],
+                messages: [
+                    "Es normal sentir un poco de aprensión. Recuerda que la anticipación es a menudo peor que la realidad. Un pequeño paso puede aliviar la preocupación.", // 1
+                    "Sientes cierta ansiedad. Respira hondo. Enfócate en lo que sí puedes controlar y divide las tareas grandes en pequeñas acciones.", // 2
+                    "La preocupación es moderada. Permítete sentirla, pero no dejes que te domine. Busca apoyo o distráete un momento con algo que te guste.", // 3
+                    "Sientes un miedo o ansiedad fuerte. Reconoce la fuente de tu temor. Afronta un pequeño aspecto de ello hoy; cada paso cuenta.", // 4
+                    "Estás abrumado/a por el miedo. Busca un espacio seguro, respira profundamente y contacta a alguien de confianza. No estás solo/a, y eres más fuerte de lo que crees." // 5
+                ]
+            },
+            sorpresa: {
+                keywords: ["sorprendido", "asombrado", "inesperado", "incredulo", "boca abierta", "estupefacto", "novedad"],
+                messages: [
+                    "Algo inesperado ha ocurrido. Tómate un momento para procesarlo. La sorpresa puede abrir nuevas puertas y perspectivas.", // 1
+                    "Te sientes un poco sorprendido/a. Observa qué ha cambiado y cómo puedes adaptarte de forma flexible.", // 2
+                    "La sorpresa es moderada. Reflexiona sobre lo que te ha impactado y qué nuevas oportunidades trae consigo.", // 3
+                    "Estás muy sorprendido/a. Permite que esta novedad te impulse a explorar nuevas ideas y caminos.", // 4
+                    "¡Qué gran sorpresa! Abre tu mente a las posibilidades que esto trae. ¡Es una oportunidad para lo nuevo y lo emocionante!" // 5
+                ]
+            },
+            tristeza: {
+                keywords: ["triste", "melancólico", "desanimado", "deprimido", "pérdida", "dolor", "pena", "abatido", "desolado"],
+                messages: [
+                    "Sientes una leve tristeza. Permítete sentirla sin juzgarte. Un pequeño gesto de autocuidado puede marcar la diferencia.", // 1
+                    "Tu desánimo es notorio. Recuerda que los momentos bajos son temporales. Conéctate con algo que te dé consuelo o paz interior.", // 2
+                    "La melancolía es moderada. Busca actividades que te aporten calma o un poco de alegría, aunque sea mínima, para nutrir tu espíritu.", // 3
+                    "Sientes una tristeza fuerte. Hablar con alguien de confianza o permitirte llorar puede ser liberador. Busca consuelo.", // 4
+                    "Estás profundamente triste. Sé muy amable contigo mismo/a. Busca apoyo en tu red o considera ayuda profesional si persiste." // 5
+                ]
+            },
+            asco: {
+                keywords: ["asco", "repugnancia", "desagrado", "repulsión", "no me gusta", "incomodidad", "repulsivo"],
+                messages: [
+                    "Sientes un ligero desagrado. Identifica qué es lo que te causa esta sensación y considera si puedes alejarte o cambiar la situación.", // 1
+                    "Experimentas disgusto. Es una señal de que algo no está bien para ti. Reflexiona sobre qué puedes modificar o evitar.", // 2
+                    "El desagrado es moderado. Busca alejarte de la fuente de este sentimiento o procesarlo de forma constructiva, protegiendo tu espacio.", // 3
+                    "Sientes una fuerte repulsión. Protege tu bienestar alejándote de lo que te causa malestar de manera activa.", // 4
+                    "¡Qué desagradable! Tu reacción es una defensa importante. Confía en tu instinto de protección y cuida tu entorno." // 5
+                ]
+            },
+            enojo: {
+                keywords: ["enojo", "ira", "frustración", "molesto", "enfadado", "rabia", "indignado", "irritado"],
+                messages: [
+                    "Te sientes un poco irritado/a. Intenta respirar y identificar la causa de tu molestia. A veces, hablarlo con calma ayuda a resolverlo.", // 1
+                    "Estás molesto/a. Encuentra una forma segura de liberar esa energía, como hacer ejercicio, escribir o escuchar música.", // 2
+                    "Sientes un enojo moderado. Canaliza esta energía hacia la búsqueda de soluciones o la expresión asertiva de tus necesidades y límites.", // 3
+                    "Tu ira es fuerte. Respira profundamente. Busca comprender la raíz del enojo y expresa tus límites de forma clara y calmada para un cambio positivo.", // 4
+                    "¡Estás muy enfadado/a! Es importante darte espacio para calmarte. Busca una salida constructiva y no actúes impulsivamente para evitar consecuencias negativas." // 5
+                ]
+            },
+            anticipacion: {
+                keywords: ["anticipación", "interés", "expectativa", "curiosidad", "esperando", "entusiasmo", "expectante"],
+                messages: [
+                    "Tienes una leve expectativa. ¡Genial! Mantén viva esa curiosidad, es el motor del descubrimiento y el aprendizaje.", // 1
+                    "Sientes interés. Canaliza esa anticipación en prepararte o aprender más sobre lo que viene, aprovechando la energía.", // 2
+                    "La expectación es moderada. Visualiza el resultado positivo y enfócate en los pasos concretos para llegar allí.", // 3
+                    "Sientes una fuerte anticipación. ¡Estás listo/a para lo que viene! Confía en tu preparación y disfruta el proceso de avance.", // 4
+                    "¡Estás muy expectante! Abraza esta energía vibrante y úsala para dar lo mejor de ti. ¡El futuro es prometedor!" // 5
+                ]
+            }
+        };
+
+        /* --- Variables de Estado de la Aplicación --- */
+        let currentStep = 1;
+        let userDescription = "";
+        let identifiedEmotion = "";
+        let intensity = 3; // Intensidad por defecto
+
+        /* --- Referencias a Elementos del DOM --- */
+        const steps = document.querySelectorAll('.step');
+        const emotionInput = document.getElementById('emotion-input');
+        const intensityRange = document.getElementById('intensity-range');
+        const intensityValueSpan = document.getElementById('intensity-value');
+        const suggestedEmotionDiv = document.getElementById('suggested-emotion');
+        const finalEmotionDisplayDiv = document.getElementById('final-emotion-display');
+        const finalIntensityDisplayDiv = document.getElementById('final-intensity-display');
+        const motivationalMessageDiv = document.getElementById('motivational-message');
+
+        /* --- Event Listener para el Slider de Intensidad --- */
+        intensityRange.addEventListener('input', (e) => {
+            intensity = parseInt(e.target.value); // Actualiza la variable de estado
+            intensityValueSpan.textContent = intensity; // Actualiza el texto que muestra el número
+        });
+
+        /* --- Funciones de Control de Pasos --- */
+        function showStep(stepNumber) {
+            // Oculta todos los pasos y muestra el actual
+            steps.forEach((step, index) => {
+                if (index === stepNumber - 1) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        /* --- Maneja la transición del Paso 1 al Paso 2 --- */
+        function handleStep1() {
+            userDescription = emotionInput.value.trim().toLowerCase(); // Obtiene la descripción del usuario
+
+            if (!userDescription) {
+                alert("Por favor, describe cómo te sientes para continuar.");
+                return; // Detiene la función si no hay descripción
+            }
+
+            identifiedEmotion = detectEmotion(userDescription); // Intenta detectar la emoción
+            if (!identifiedEmotion) {
+                identifiedEmotion = "desconocida"; // Si no se detecta, usa 'desconocida'
+            }
+
+            // Actualiza la UI para mostrar la emoción sugerida en el Paso 2
+            suggestedEmotionDiv.textContent = `Emoción principal: ${capitalizeFirstLetter(identifiedEmotion)}`;
+            
+            // Asegúrate de que el valor del slider y la variable de estado coincidan al pasar al paso 2
+            intensity = parseInt(intensityRange.value); 
+            intensityValueSpan.textContent = intensity; 
+
+            showStep(2); // Muestra el siguiente paso
+            currentStep = 2;
+        }
+
+        /* --- Maneja la transición del Paso 2 al Paso 3 --- */
+        function handleStep2() {
+            intensity = parseInt(intensityRange.value); // Obtiene la intensidad final seleccionada
+
+            let message = "No se encontró un mensaje específico para esta combinación. ¡Mantén la calma y respira hondo!";
+            
+            if (identifiedEmotion === "desconocida") {
+                // Mensaje genérico si la emoción no pudo ser identificada
+                message = "A veces, el primer paso para entender lo que sientes es simplemente nombrarlo. Reflexiona sobre estas sensaciones.";
+            } else if (emotionsData[identifiedEmotion] && emotionsData[identifiedEmotion].messages) {
+                // Busca el mensaje correspondiente a la emoción y la intensidad
+                // El índice del array es intensidad - 1 (ya que la intensidad va de 1 a 5)
+                const messageIndex = Math.max(0, Math.min(intensity - 1, emotionsData[identifiedEmotion].messages.length - 1));
+                message = emotionsData[identifiedEmotion].messages[messageIndex];
+            }
+            
+            // Muestra los resultados finales en el Paso 3
+            finalEmotionDisplayDiv.textContent = `${capitalizeFirstLetter(identifiedEmotion)}`;
+            finalIntensityDisplayDiv.textContent = `Intensidad: ${intensity} / 5`;
+            motivationalMessageDiv.innerHTML = `<strong>Tu mensaje:</strong> ${message}`; // Usa innerHTML para permitir negritas
+
+            showStep(3); // Muestra la pantalla de resultados
+            currentStep = 3;
+        }
+
+        /* --- Detecta la emoción basándose en palabras clave --- */
+        function detectEmotion(description) {
+            for (const emotion in emotionsData) { // Itera sobre cada emoción definida
+                for (const keyword of emotionsData[emotion].keywords) { // Itera sobre las palabras clave de esa emoción
+                    if (description.includes(keyword)) { // Si la descripción contiene la palabra clave
+                        return emotion; // Devuelve el nombre de la emoción
+                    }
+                }
+            }
+            return null; // Devuelve null si ninguna palabra clave coincide
+        }
+
+        /* --- Capitaliza la primera letra de una cadena --- */
+        function capitalizeFirstLetter(string) {
+            if (!string) return ""; // Si la cadena está vacía, devuelve vacío
+            if (string === "desconocida") return "Desconocida"; // Caso especial para 'desconocida'
+            return string.charAt(0).toUpperCase() + string.slice(1); // Pone la primera letra en mayúscula
+        }
+
+        /* --- Reinicia la aplicación para explorar otra emoción --- */
+        function resetApp() {
+            // Limpia todos los campos y valores
+            emotionInput.value = "";
+            intensity = 3; // Restablece la intensidad por defecto
+            intensityRange.value = 3;
+            intensityValueSpan.textContent = 3;
+            suggestedEmotionDiv.textContent = "";
+            finalEmotionDisplayDiv.textContent = "";
+            finalIntensityDisplayDiv.textContent = "";
+            motivationalMessageDiv.textContent = "";
+            
+            // Vuelve al primer paso
+            showStep(1);
+            currentStep = 1;
+        }
+
+        /* --- Inicializa la aplicación mostrando el primer paso al cargar la página --- */
+        showStep(currentStep);
+    </script>
+</body>
+</html>
